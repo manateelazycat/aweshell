@@ -6,8 +6,8 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-08-13 23:18:35
-;; Version: 1.3
-;; Last-Updated: 2018-08-14 14:59:45
+;; Version: 1.4
+;; Last-Updated: 2018-08-15 06:33:25
 ;;           By: Andy Stewart
 ;; URL: http://www.emacswiki.org/emacs/download/aweshell.el
 ;; Keywords:
@@ -88,6 +88,9 @@
 
 ;;; Change log:
 ;;
+;; 2018/08/15
+;;      * Remove face settings.
+;;      
 ;; 2018/08/14
 ;;      * Save buffer in `aweshell-buffer-list', instead save buffer name.
 ;;      * Change aweshell buffer name by directory change.
@@ -278,16 +281,6 @@ Create new one if no eshell buffer exists."
             (define-key eshell-mode-map (kbd aweshell-clear-buffer-key) 'aweshell-clear-buffer)
             (define-key eshell-mode-map (kbd aweshell-sudo-toggle-key) 'aweshell-sudo-toggle)
             ))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Aweshell face ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(custom-set-faces
- '(epe-dir-face ((t (:foreground "green3"))))
- '(epe-git-face ((t (:foreground "systemRedColor"))))
- '(epe-pipeline-delimiter-face ((t (:foreground "green4"))))
- '(epe-pipeline-host-face ((t (:foreground "systemGreenColor"))))
- '(epe-pipeline-time-face ((t (:foreground "systemGrayColor"))))
- '(epe-pipeline-user-face ((t (:foreground "gold"))))
- )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Handy aliases ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (add-hook 'eshell-mode-hook
