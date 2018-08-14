@@ -6,8 +6,8 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-08-13 23:18:35
-;; Version: 0.7
-;; Last-Updated: 2018-08-14 13:16:08
+;; Version: 0.8
+;; Last-Updated: 2018-08-14 13:24:35
 ;;           By: Andy Stewart
 ;; URL: http://www.emacswiki.org/emacs/download/aweshell.el
 ;; Keywords:
@@ -92,6 +92,7 @@
 ;;      * Fix error "wrong-type-argument stringp nil" by `aweshell-validate-command'
 ;;      * Add some handy aliases.
 ;;      * Make `aweshell-validate-command' works with eshell aliases.
+;;      * Synchronal buffer name with shell path by `epe-fish-path'.
 ;;
 ;; 2018/08/13
 ;;      * First released.
@@ -145,7 +146,7 @@
   :group 'aweshell)
 
 (defcustom aweshell-invalid-command-color "#FF0000"
-  "The color of valid command by `aweshell-validate-command'."
+  "The color of invalid command by `aweshell-validate-command'."
   :type 'string
   :group 'aweshell)
 
@@ -331,10 +332,7 @@ Create new one if no eshell buffer exists."
 (defun aweshell-sync-dir-buffer-name ()
   "Change aweshell buffer name by directory change."
   (when (equal major-mode 'eshell-mode)
-    (rename-buffer (format "Aweshell: %s"
-                           (propertize
-                            (abbreviate-file-name default-directory)
-                            'face `(:foreground ,"gold")))
+    (rename-buffer (format "Aweshell: %s" (epe-fish-path default-directory))
                    t)))
 
 (add-hook 'eshell-directory-change-hook #'aweshell-sync-dir-buffer-name)
