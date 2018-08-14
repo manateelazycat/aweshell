@@ -6,8 +6,8 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-08-13 23:18:35
-;; Version: 1.0
-;; Last-Updated: 2018-08-14 14:08:00
+;; Version: 1.1
+;; Last-Updated: 2018-08-14 14:38:59
 ;;           By: Andy Stewart
 ;; URL: http://www.emacswiki.org/emacs/download/aweshell.el
 ;; Keywords:
@@ -97,6 +97,7 @@
 ;;      * Synchronal buffer name with shell path by `epe-fish-path'.
 ;;      * Use `epe-theme-pipeline' as default theme.
 ;;      * Complete customize options in docs.
+;;      * Redirect `clear' alias to `aweshell-clear-buffer'.
 ;;
 ;; 2018/08/13
 ;;      * First released.
@@ -291,6 +292,7 @@ Create new one if no eshell buffer exists."
             (eshell/alias "f" "find-file $1")
             (eshell/alias "fo" "find-file-other-window $1")
             (eshell/alias "d" "dired $1")
+            (eshell/alias "clear" "aweshell-clear-buffer")
             (let ((ls (if (file-exists-p "/usr/local/bin/gls")
                           "/usr/local/bin/gls"
                         "/bin/ls")))
