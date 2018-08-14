@@ -6,8 +6,8 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-08-13 23:18:35
-;; Version: 0.3
-;; Last-Updated: 2018-08-14 10:14:48
+;; Version: 0.4
+;; Last-Updated: 2018-08-14 11:30:06
 ;;           By: Andy Stewart
 ;; URL: http://www.emacswiki.org/emacs/download/aweshell.el
 ;; Keywords:
@@ -87,6 +87,7 @@
 ;; 2018/08/14
 ;;      * Save buffer in `aweshell-buffer-list', instead save buffer name.
 ;;      * Change aweshell buffer name by directory change.
+;;      * Refacotry code.
 ;;
 ;; 2018/08/13
 ;;      * First released.
@@ -248,18 +249,6 @@ Create new one if no eshell buffer exists."
           (insert "sudo ")
           )))))
 
-(defun aweshell-sync-dir-buffer-name ()
-  "Change aweshell buffer name by directory change."
-  (when (equal major-mode 'eshell-mode)
-    (rename-buffer (format "Aweshell: %s"
-                           (propertize
-                            (abbreviate-file-name default-directory)
-                            'face `(:foreground ,"gold")))
-                   t)))
-
-(add-hook 'eshell-directory-change-hook #'aweshell-sync-dir-buffer-name)
-(add-hook 'eshell-mode-hook #'aweshell-sync-dir-buffer-name)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Aweshell keymap ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (add-hook 'eshell-mode-hook
           (lambda ()
@@ -302,6 +291,20 @@ Create new one if no eshell buffer exists."
 (add-hook 'eshell-mode-hook
           (lambda ()
             (add-hook 'post-command-hook #'aweshell-validate-command t t)))
+
+
+;; Synchronal buffer name by directory change.
+(defun aweshell-sync-dir-buffer-name ()
+  "Change aweshell buffer name by directory change."
+  (when (equal major-mode 'eshell-mode)
+    (rename-buffer (format "Aweshell: %s"
+                           (propertize
+                            (abbreviate-file-name default-directory)
+                            'face `(:foreground ,"gold")))
+                   t)))
+
+(add-hook 'eshell-directory-change-hook #'aweshell-sync-dir-buffer-name)
+(add-hook 'eshell-mode-hook #'aweshell-sync-dir-buffer-name)
 
 (provide 'aweshell)
 
