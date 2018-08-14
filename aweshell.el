@@ -6,8 +6,8 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-08-13 23:18:35
-;; Version: 0.1
-;; Last-Updated: 2018-08-13 23:18:35
+;; Version: 0.2
+;; Last-Updated: 2018-08-14 10:03:07
 ;;           By: Andy Stewart
 ;; URL: http://www.emacswiki.org/emacs/download/aweshell.el
 ;; Keywords:
@@ -83,6 +83,9 @@
 
 ;;; Change log:
 ;;
+;; 2018/08/14
+;;      * Save buffer in `aweshell-buffer-list', instead save buffer name.
+;;
 ;; 2018/08/13
 ;;      * First released.
 ;;
@@ -130,7 +133,8 @@
   :group 'aweshell)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Variable ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defvar aweshell-buffer-list nil)
+(defvar aweshell-buffer-list nil
+  "The list of non-dedicated eshell buffers.")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Hook ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -142,7 +146,7 @@
   (when (eq major-mode 'eshell-mode)
     (let ((killed-buffer (current-buffer)))
       (setq aweshell-buffer-list
-            (delq (buffer-name killed-buffer) aweshell-buffer-list)))))
+            (delq killed-buffer aweshell-buffer-list)))))
 
 (defun aweshell-get-buffer-index ()
   (let ((eshell-buffer-index-list (aweshell-get-buffer-index-list))
@@ -187,7 +191,7 @@
 (defun aweshell-new ()
   "Create new eshell buffer."
   (interactive)
-  (setq aweshell-buffer-list (nconc aweshell-buffer-list (list (buffer-name (eshell (aweshell-get-buffer-index)))))))
+  (setq aweshell-buffer-list (nconc aweshell-buffer-list (list (eshell (aweshell-get-buffer-index))))))
 
 (defun aweshell-next ()
   "Select next eshell buffer.
@@ -195,7 +199,7 @@ Create new one if no eshell buffer exists."
   (interactive)
   (if (or (not aweshell-buffer-list) (equal (length aweshell-buffer-list) 0))
       (aweshell-new)
-    (let* ((current-buffer-index (cl-position (buffer-name) aweshell-buffer-list))
+    (let* ((current-buffer-index (cl-position (current-buffer) aweshell-buffer-list))
            (switch-index (if current-buffer-index
                              (if (>= current-buffer-index (- (length aweshell-buffer-list) 1))
                                  0
@@ -210,7 +214,7 @@ Create new one if no eshell buffer exists."
   (interactive)
   (if (or (not aweshell-buffer-list) (equal (length aweshell-buffer-list) 0))
       (aweshell-new)
-    (let* ((current-buffer-index (cl-position (buffer-name) aweshell-buffer-list))
+    (let* ((current-buffer-index (cl-position (current-buffer) aweshell-buffer-list))
            (switch-index (if current-buffer-index
                              (if (<= current-buffer-index 0)
                                  (- (length aweshell-buffer-list) 1)
