@@ -6,8 +6,8 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-08-13 23:18:35
-;; Version: 0.8
-;; Last-Updated: 2018-08-14 13:24:35
+;; Version: 0.9
+;; Last-Updated: 2018-08-14 14:05:27
 ;;           By: Andy Stewart
 ;; URL: http://www.emacswiki.org/emacs/download/aweshell.el
 ;; Keywords:
@@ -93,6 +93,7 @@
 ;;      * Add some handy aliases.
 ;;      * Make `aweshell-validate-command' works with eshell aliases.
 ;;      * Synchronal buffer name with shell path by `epe-fish-path'.
+;;      * Use `epe-theme-pipeline' as default theme.
 ;;
 ;; 2018/08/13
 ;;      * First released.
@@ -271,6 +272,16 @@ Create new one if no eshell buffer exists."
             (define-key eshell-mode-map (kbd aweshell-sudo-toggle-key) 'aweshell-sudo-toggle)
             ))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Aweshell face ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(custom-set-faces
+ '(epe-dir-face ((t (:foreground "green3"))))
+ '(epe-git-face ((t (:foreground "systemRedColor"))))
+ '(epe-pipeline-delimiter-face ((t (:foreground "green4"))))
+ '(epe-pipeline-host-face ((t (:foreground "systemGreenColor"))))
+ '(epe-pipeline-time-face ((t (:foreground "systemGrayColor"))))
+ '(epe-pipeline-user-face ((t (:foreground "gold"))))
+ )
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Handy aliases ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (add-hook 'eshell-mode-hook
           (lambda ()
@@ -288,9 +299,8 @@ Create new one if no eshell buffer exists."
 ;; Display extra information and color for your eshell prompt.
 (require 'eshell-prompt-extras)
 (with-eval-after-load "esh-opt"
-  (autoload 'epe-theme-lambda "eshell-prompt-extras")
   (setq eshell-highlight-prompt nil
-        eshell-prompt-function 'epe-theme-lambda))
+        eshell-prompt-function 'epe-theme-pipeline))
 
 ;; esh-autosuggest
 ;; Fish-like history autosuggestions in eshell
