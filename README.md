@@ -1,21 +1,21 @@
 # What is aweshell?
 
-I created `multi-term.el' and use it many years.
+I created `multi-term.el` and use it many years.
 
-Now I'm a big fans of `eshell'.
+Now I'm a big fans of `eshell`.
 
-So i write `aweshell.el' to extension `eshell' with below features:
+So I wrote `aweshell.el` to extend `eshell` with these features:
 
 1. Create and manage multiple eshell buffers.
 2. Add some useful commands, such as: clear buffer, toggle sudo etc.
-3. Display extra information and color like zsh, powered by `eshell-prompt-extras'
-4. Add Fish-like history autosuggestions, powered by `esh-autosuggest'
+3. Display extra information and color like zsh, powered by `eshell-prompt-extras`
+4. Add Fish-like history autosuggestions, powered by `esh-autosuggest`
 5. Validate and highlight command before post to eshell.
-6. Fix error `command not found' in MacOS.
+6. Fix error `command not found` in MacOS.
 
 # Installation
 
-Put `aweshell.el', `esh-autosuggest.el', `eshell-prompt-extras.el', `exec-path-from-shell.el' to your load-path.
+Put `aweshell.el`, `esh-autosuggest.el`, `eshell-prompt-extras.el`, `exec-path-from-shell.el` to your load-path.
 The load-path is usually ~/elisp/.
 It's set in your ~/.emacs like this:
 ```Elisp
@@ -23,7 +23,7 @@ It's set in your ~/.emacs like this:
 (require 'aweshell)
 ```
 
-Binding your favorite key to functions:
+Bind your favorite key to functions:
 
 ```Elisp
 aweshell-new
@@ -33,9 +33,9 @@ aweshell-clear-buffer
 aweshell-sudo-toggle
 ```
 
-# Customize:
+# Customize
 
-Below of the above can customize by:
+Customize variables below by:
 ```Elisp
 M-x customize-group RET aweshell RET
 ```
@@ -45,3 +45,5 @@ aweshell-complete-selection-key
 aweshell-clear-buffer-key
 aweshell-sudo-toggle-key
 ```
+
+Customize prompt as directed in [eshell-prompt-extras' README](https://github.com/kaihaosw/eshell-prompt-extras#themes).
