@@ -6,8 +6,8 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-08-13 23:18:35
-;; Version: 0.4
-;; Last-Updated: 2018-08-14 11:30:06
+;; Version: 0.5
+;; Last-Updated: 2018-08-14 11:49:05
 ;;           By: Andy Stewart
 ;; URL: http://www.emacswiki.org/emacs/download/aweshell.el
 ;; Keywords:
@@ -88,6 +88,7 @@
 ;;      * Save buffer in `aweshell-buffer-list', instead save buffer name.
 ;;      * Change aweshell buffer name by directory change.
 ;;      * Refacotry code.
+;;      * Fix error "wrong-type-argument stringp nil" by `aweshell-validate-command' 
 ;;
 ;; 2018/08/13
 ;;      * First released.
@@ -284,10 +285,11 @@ Create new one if no eshell buffer exists."
     (let ((beg (match-beginning 1))
           (end (match-end 1))
           (command (match-string 1)))
-      (put-text-property beg end
-                         'face `(:foreground ,(if (executable-find command)
-                                                  "#98C379"
-                                                "red"))))))
+      (when command
+        (put-text-property beg end
+                           'face `(:foreground ,(if (executable-find command)
+                                                    "#98C379"
+                                                  "red")))))))
 (add-hook 'eshell-mode-hook
           (lambda ()
             (add-hook 'post-command-hook #'aweshell-validate-command t t)))
