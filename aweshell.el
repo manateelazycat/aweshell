@@ -6,8 +6,8 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-08-13 23:18:35
-;; Version: 1.1
-;; Last-Updated: 2018-08-14 14:38:59
+;; Version: 1.2
+;; Last-Updated: 2018-08-14 14:50:37
 ;;           By: Andy Stewart
 ;; URL: http://www.emacswiki.org/emacs/download/aweshell.el
 ;; Keywords:
@@ -49,8 +49,9 @@
 ;; 4. Add Fish-like history autosuggestions, powered by `esh-autosuggest'
 ;; 5. Validate and highlight command before post to eshell.
 ;; 6. Change buffer name by directory change.
-;; 7. Fix error `command not found' in MacOS.
+;; 7. Add completions for git command.
 ;; 8. Build-in some handy alias, such as: f (find-file), fo (find-file-other-window), d (dired), ll (list files)
+;; 9. Fix error `command not found' in MacOS.
 ;;
 
 ;;; Installation:
@@ -98,6 +99,7 @@
 ;;      * Use `epe-theme-pipeline' as default theme.
 ;;      * Complete customize options in docs.
 ;;      * Redirect `clear' alias to `aweshell-clear-buffer'.
+;;      * Add completions for git command.
 ;;
 ;; 2018/08/13
 ;;      * First released.
@@ -352,6 +354,58 @@ Create new one if no eshell buffer exists."
 
 (add-hook 'eshell-directory-change-hook #'aweshell-sync-dir-buffer-name)
 (add-hook 'eshell-mode-hook #'aweshell-sync-dir-buffer-name)
+
+;; Add completions for git command.
+(defun pcmpl-git-commands ()
+  "Return the most common git commands by parsing the git output."
+  (with-temp-buffer
+    (call-process-shell-command "git" nil (current-buffer) nil "help" "--all")
+    (goto-char 0)
+    (search-forward "available git commands in")
+    (let (commands)
+      (while (re-search-forward
+              "^[[:blank:]]+\\([[:word:]-.]+\\)[[:blank:]]*\\([[:word:]-.]+\\)?"
+              nil t)
+        (push (match-string 1) commands)
+        (when (match-string 2)
+          (push (match-string 2) commands)))
+      (sort commands #'string<))))
+
+(defconst pcmpl-git-commands (pcmpl-git-commands)
+  "List of `git' commands.")
+
+(defvar pcmpl-git-ref-list-cmd "git for-each-ref refs/ --format='%(refname)'"
+  "The `git' command to run to get a list of refs.")
+
+(defun pcmpl-git-get-refs (type)
+  "Return a list of `git' refs filtered by TYPE."
+  (with-temp-buffer
+    (insert (shell-command-to-string pcmpl-git-ref-list-cmd))
+    (goto-char (point-min))
+    (let (refs)
+      (while (re-search-forward (concat "^refs/" type "/\\(.+\\)$") nil t)
+        (push (match-string 1) refs))
+      (nreverse refs))))
+
+(defun pcmpl-git-remotes ()
+  "Return a list of remote repositories."
+  (split-string (shell-command-to-string "git remote")))
+
+(defun pcomplete/git ()
+  "Completion for `git'."
+  ;; Completion for the command argument.
+  (pcomplete-here* pcmpl-git-commands)
+  (cond
+   ((pcomplete-match "help" 1)
+    (pcomplete-here* pcmpl-git-commands))
+   ((pcomplete-match (regexp-opt '("pull" "push")) 1)
+    (pcomplete-here (pcmpl-git-remotes)))
+   ;; provide branch completion for the command `checkout'.
+   ((pcomplete-match "checkout" 1)
+    (pcomplete-here* (append (pcmpl-git-get-refs "heads")
+                             (pcmpl-git-get-refs "tags"))))
+   (t
+    (while (pcomplete-here (pcomplete-entries))))))
 
 (provide 'aweshell)
 
