@@ -6,8 +6,8 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-08-13 23:18:35
-;; Version: 0.5
-;; Last-Updated: 2018-08-14 11:49:05
+;; Version: 0.6
+;; Last-Updated: 2018-08-14 13:01:42
 ;;           By: Andy Stewart
 ;; URL: http://www.emacswiki.org/emacs/download/aweshell.el
 ;; Keywords:
@@ -50,6 +50,7 @@
 ;; 5. Validate and highlight command before post to eshell.
 ;; 6. Change buffer name by directory change.
 ;; 7. Fix error `command not found' in MacOS.
+;; 8. Build-in some handy alias, such as: f (find-file), fo (find-file-other-window), d (dired), ll (list files)
 ;;
 
 ;;; Installation:
@@ -88,7 +89,8 @@
 ;;      * Save buffer in `aweshell-buffer-list', instead save buffer name.
 ;;      * Change aweshell buffer name by directory change.
 ;;      * Refacotry code.
-;;      * Fix error "wrong-type-argument stringp nil" by `aweshell-validate-command' 
+;;      * Fix error "wrong-type-argument stringp nil" by `aweshell-validate-command'
+;;      * Add some handy aliases.
 ;;
 ;; 2018/08/13
 ;;      * First released.
@@ -256,6 +258,17 @@ Create new one if no eshell buffer exists."
             (define-key eshell-mode-map (kbd aweshell-clear-buffer-key) 'aweshell-clear-buffer)
             (define-key eshell-mode-map (kbd aweshell-sudo-toggle-key) 'aweshell-sudo-toggle)
             ))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Handy aliases ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(add-hook 'eshell-mode-hook
+          (lambda ()
+            (eshell/alias "f" "find-file $1")
+            (eshell/alias "fo" "find-file-other-window $1")
+            (eshell/alias "d" "dired $1")
+            (let ((ls (if (file-exists-p "/usr/local/bin/gls")
+                          "/usr/local/bin/gls"
+                        "/bin/ls")))
+              (eshell/alias "ll" (concat ls " -AlohG --color=always")))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; EShell extensions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
