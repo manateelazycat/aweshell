@@ -6,8 +6,8 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-08-13 23:18:35
-;; Version: 0.2
-;; Last-Updated: 2018-08-14 10:03:07
+;; Version: 0.3
+;; Last-Updated: 2018-08-14 10:14:48
 ;;           By: Andy Stewart
 ;; URL: http://www.emacswiki.org/emacs/download/aweshell.el
 ;; Keywords:
@@ -48,7 +48,8 @@
 ;; 3. Display extra information and color like zsh, powered by `eshell-prompt-extras'
 ;; 4. Add Fish-like history autosuggestions, powered by `esh-autosuggest'
 ;; 5. Validate and highlight command before post to eshell.
-;; 6. Fix error `command not found' in MacOS.
+;; 6. Change buffer name by directory change.
+;; 7. Fix error `command not found' in MacOS.
 ;;
 
 ;;; Installation:
@@ -85,6 +86,7 @@
 ;;
 ;; 2018/08/14
 ;;      * Save buffer in `aweshell-buffer-list', instead save buffer name.
+;;      * Change aweshell buffer name by directory change.
 ;;
 ;; 2018/08/13
 ;;      * First released.
@@ -93,7 +95,7 @@
 ;;; Acknowledgements:
 ;;
 ;; Samray: copy `aweshell-clear-buffer' and `aweshell-sudo-toggle'
-;; casouri: copy `aweshell-validate-command'
+;; casouri: copy `aweshell-validate-command' and `aweshell-sync-dir-buffer-name'
 ;;
 
 ;;; TODO
@@ -245,6 +247,18 @@ Create new one if no eshell buffer exists."
           (eshell-bol)
           (insert "sudo ")
           )))))
+
+(defun aweshell-sync-dir-buffer-name ()
+  "Change aweshell buffer name by directory change."
+  (when (equal major-mode 'eshell-mode)
+    (rename-buffer (format "Aweshell: %s"
+                           (propertize
+                            (abbreviate-file-name default-directory)
+                            'face `(:foreground ,"gold")))
+                   t)))
+
+(add-hook 'eshell-directory-change-hook #'aweshell-sync-dir-buffer-name)
+(add-hook 'eshell-mode-hook #'aweshell-sync-dir-buffer-name)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Aweshell keymap ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (add-hook 'eshell-mode-hook
