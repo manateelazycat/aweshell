@@ -6,8 +6,8 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-08-13 23:18:35
-;; Version: 1.5
-;; Last-Updated: 2018-08-15 07:11:25
+;; Version: 1.6
+;; Last-Updated: 2018-08-15 07:17:10
 ;;           By: Andy Stewart
 ;; URL: http://www.emacswiki.org/emacs/download/aweshell.el
 ;; Keywords:
@@ -43,16 +43,15 @@
 ;; Now I'm a big fans of `eshell'.
 ;;
 ;; So i write `aweshell.el' to extension `eshell' with below features:
-;; 1.  Create and manage multiple eshell buffers.
-;; 2.  Add some useful commands, such as: clear buffer, toggle sudo etc.
-;; 3.  Display extra information and color like zsh, powered by `eshell-prompt-extras'
-;; 4.  Add Fish-like history autosuggestions, powered by `esh-autosuggest'
-;; 5.  Validate and highlight command before post to eshell.
-;; 6.  Change buffer name by directory change.
-;; 7.  Add completions for git command.
-;; 8.  Fix error `command not found' in MacOS.
-;; 9.  Read alias from bash and zsh.
-;; 10. Build-in some handy alias, such as:
+;; 1. Create and manage multiple eshell buffers.
+;; 2. Add some useful commands, such as: clear buffer, toggle sudo etc.
+;; 3. Display extra information and color like zsh, powered by `eshell-prompt-extras'
+;; 4. Add Fish-like history autosuggestions, powered by `esh-autosuggest', support histories from bash/zsh/eshell.
+;; 5. Validate and highlight command before post to eshell.
+;; 6. Change buffer name by directory change.
+;; 7. Add completions for git command.
+;; 8. Fix error `command not found' in MacOS.
+;; 9. Build-in some handy alias, such as:
 ;;    f (find-file)
 ;;    fo (find-file-other-window)
 ;;    d (dired)
@@ -98,6 +97,7 @@
 ;; 2018/08/15
 ;;      * Remove face settings.
 ;;      * Add `aweshell-search-history' and merge bash/zsh history in `esh-autosuggest' .
+;;      * Fix history docs.
 ;;
 ;; 2018/08/14
 ;;      * Save buffer in `aweshell-buffer-list', instead save buffer name.
