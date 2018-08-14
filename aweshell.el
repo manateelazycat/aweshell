@@ -6,8 +6,8 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-08-13 23:18:35
-;; Version: 0.9
-;; Last-Updated: 2018-08-14 14:05:27
+;; Version: 1.0
+;; Last-Updated: 2018-08-14 14:08:00
 ;;           By: Andy Stewart
 ;; URL: http://www.emacswiki.org/emacs/download/aweshell.el
 ;; Keywords:
@@ -78,6 +78,8 @@
 ;; `aweshell-complete-selection-key'
 ;; `aweshell-clear-buffer-key'
 ;; `aweshell-sudo-toggle-key'
+;; `aweshell-valid-command-color'
+;; `aweshell-invalid-command-color'
 ;;
 ;; All of the above can customize by:
 ;;      M-x customize-group RET aweshell RET
@@ -94,6 +96,7 @@
 ;;      * Make `aweshell-validate-command' works with eshell aliases.
 ;;      * Synchronal buffer name with shell path by `epe-fish-path'.
 ;;      * Use `epe-theme-pipeline' as default theme.
+;;      * Complete customize options in docs.
 ;;
 ;; 2018/08/13
 ;;      * First released.
