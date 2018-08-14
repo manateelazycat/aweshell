@@ -63,6 +63,34 @@ respectively."
   "Keymap that is enabled during an active history
   autosuggestion.")
 
+(defun esh-parse-bash-history ()
+  "Parse the bash history."
+  (let (collection bash_history)
+    (shell-command "history -r")        ; reload history
+    (setq collection
+          (nreverse
+           (split-string (with-temp-buffer (insert-file-contents (file-truename "~/.bash_history"))
+                                           (buffer-string))
+                         "\n"
+                         t)))
+    (when (and collection (> (length collection) 0)
+               (setq bash_history collection))
+      bash_history)))
+
+(defun esh-parse-zsh-history ()
+  "Parse the bash history."
+  (let (collection zsh_history)
+    (shell-command "history -r")        ; reload history
+    (setq collection
+          (nreverse
+           (split-string (with-temp-buffer (insert-file-contents (file-truename "~/.zsh_history"))
+                                           (replace-regexp-in-string "^:[^;]*;" "" (buffer-string)))
+                         "\n"
+                         t)))
+    (when (and collection (> (length collection) 0)
+               (setq zsh_history collection))
+      zsh_history)))
+
 (defun esh-autosuggest-candidates (prefix)
   "Select the first eshell history candidate that starts with PREFIX."
   (let* ((history
@@ -70,10 +98,23 @@ respectively."
            (mapcar (lambda (str)
                      (string-trim (substring-no-properties str)))
                    (ring-elements eshell-history-ring))))
+         (bash-history
+          (delete-dups
+           (mapcar (lambda (str)
+                     (string-trim (substring-no-properties str)))
+                   (esh-parse-bash-history))))
+         (zsh-history
+          (delete-dups
+           (mapcar (lambda (str)
+                     (string-trim (substring-no-properties str)))
+                   (esh-parse-zsh-history))))
          (most-similar (cl-find-if
                         (lambda (str)
                           (string-prefix-p prefix str))
-                        history)))
+                        (append
+                         history
+                         bash-history
+                         zsh-history))))
     (when most-similar
       `(,most-similar))))
 

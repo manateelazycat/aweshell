@@ -6,8 +6,8 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-08-13 23:18:35
-;; Version: 1.4
-;; Last-Updated: 2018-08-15 06:33:25
+;; Version: 1.5
+;; Last-Updated: 2018-08-15 07:11:25
 ;;           By: Andy Stewart
 ;; URL: http://www.emacswiki.org/emacs/download/aweshell.el
 ;; Keywords:
@@ -43,15 +43,20 @@
 ;; Now I'm a big fans of `eshell'.
 ;;
 ;; So i write `aweshell.el' to extension `eshell' with below features:
-;; 1. Create and manage multiple eshell buffers.
-;; 2. Add some useful commands, such as: clear buffer, toggle sudo etc.
-;; 3. Display extra information and color like zsh, powered by `eshell-prompt-extras'
-;; 4. Add Fish-like history autosuggestions, powered by `esh-autosuggest'
-;; 5. Validate and highlight command before post to eshell.
-;; 6. Change buffer name by directory change.
-;; 7. Add completions for git command.
-;; 8. Build-in some handy alias, such as: f (find-file), fo (find-file-other-window), d (dired), ll (ls -al)
-;; 9. Fix error `command not found' in MacOS.
+;; 1.  Create and manage multiple eshell buffers.
+;; 2.  Add some useful commands, such as: clear buffer, toggle sudo etc.
+;; 3.  Display extra information and color like zsh, powered by `eshell-prompt-extras'
+;; 4.  Add Fish-like history autosuggestions, powered by `esh-autosuggest'
+;; 5.  Validate and highlight command before post to eshell.
+;; 6.  Change buffer name by directory change.
+;; 7.  Add completions for git command.
+;; 8.  Fix error `command not found' in MacOS.
+;; 9.  Read alias from bash and zsh.
+;; 10. Build-in some handy alias, such as:
+;;    f (find-file)
+;;    fo (find-file-other-window)
+;;    d (dired)
+;;    ll (ls -al)
 ;;
 
 ;;; Installation:
@@ -79,6 +84,8 @@
 ;; `aweshell-complete-selection-key'
 ;; `aweshell-clear-buffer-key'
 ;; `aweshell-sudo-toggle-key'
+;; `aweshell-search-history-key'
+;;
 ;; `aweshell-valid-command-color'
 ;; `aweshell-invalid-command-color'
 ;;
@@ -90,7 +97,8 @@
 ;;
 ;; 2018/08/15
 ;;      * Remove face settings.
-;;      
+;;      * Add `aweshell-search-history' and merge bash/zsh history in `esh-autosuggest' .
+;;
 ;; 2018/08/14
 ;;      * Save buffer in `aweshell-buffer-list', instead save buffer name.
 ;;      * Change aweshell buffer name by directory change.
@@ -111,7 +119,7 @@
 
 ;;; Acknowledgements:
 ;;
-;; Samray: copy `aweshell-clear-buffer' and `aweshell-sudo-toggle'
+;; Samray: copy `aweshell-clear-buffer', `aweshell-sudo-toggle' and `aweshell-search-history'
 ;; casouri: copy `aweshell-validate-command' and `aweshell-sync-dir-buffer-name'
 ;;
 
@@ -148,6 +156,11 @@
 
 (defcustom aweshell-sudo-toggle-key "C-S-l"
   "The keystroke for toggle sudo"
+  :type 'string
+  :group 'aweshell)
+
+(defcustom aweshell-search-history-key "M-'"
+  "The keystroke for search history"
   :type 'string
   :group 'aweshell)
 
@@ -275,11 +288,28 @@ Create new one if no eshell buffer exists."
           (insert "sudo ")
           )))))
 
+(defun aweshell-search-history ()
+  "Interactive search eshell history."
+  (interactive)
+  (save-excursion
+    (let* ((start-pos (eshell-beginning-of-input))
+           (input (eshell-get-old-input))
+           (esh-history (when (> (ring-size eshell-history-ring) 0)
+                          (ring-elements eshell-history-ring)))
+           (all-shell-history (append esh-history (esh-parse-zsh-history) (aweshell-parse-bash-history))))
+      (let* ((command (completing-read "Search history: " all-shell-history)))
+        (eshell-kill-input)
+        (insert command)
+        )))
+  ;; move cursor to eol
+  (end-of-line))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Aweshell keymap ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (add-hook 'eshell-mode-hook
           (lambda ()
             (define-key eshell-mode-map (kbd aweshell-clear-buffer-key) 'aweshell-clear-buffer)
             (define-key eshell-mode-map (kbd aweshell-sudo-toggle-key) 'aweshell-sudo-toggle)
+            (define-key eshell-mode-map (kbd aweshell-search-history-key) 'aweshell-search-history)
             ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Handy aliases ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
