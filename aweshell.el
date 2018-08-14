@@ -6,8 +6,8 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-08-13 23:18:35
-;; Version: 1.2
-;; Last-Updated: 2018-08-14 14:50:37
+;; Version: 1.3
+;; Last-Updated: 2018-08-14 14:59:45
 ;;           By: Andy Stewart
 ;; URL: http://www.emacswiki.org/emacs/download/aweshell.el
 ;; Keywords:
@@ -50,7 +50,7 @@
 ;; 5. Validate and highlight command before post to eshell.
 ;; 6. Change buffer name by directory change.
 ;; 7. Add completions for git command.
-;; 8. Build-in some handy alias, such as: f (find-file), fo (find-file-other-window), d (dired), ll (list files)
+;; 8. Build-in some handy alias, such as: f (find-file), fo (find-file-other-window), d (dired), ll (ls -al)
 ;; 9. Fix error `command not found' in MacOS.
 ;;
 
@@ -100,6 +100,7 @@
 ;;      * Complete customize options in docs.
 ;;      * Redirect `clear' alias to `aweshell-clear-buffer'.
 ;;      * Add completions for git command.
+;;      * Adjust `ls' alias.
 ;;
 ;; 2018/08/13
 ;;      * First released.
@@ -295,10 +296,8 @@ Create new one if no eshell buffer exists."
             (eshell/alias "fo" "find-file-other-window $1")
             (eshell/alias "d" "dired $1")
             (eshell/alias "clear" "aweshell-clear-buffer")
-            (let ((ls (if (file-exists-p "/usr/local/bin/gls")
-                          "/usr/local/bin/gls"
-                        "/bin/ls")))
-              (eshell/alias "ll" (concat ls " -AlohG --color=always")))))
+            (eshell/alias "ll" "ls -al")
+            ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; EShell extensions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
