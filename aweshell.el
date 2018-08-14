@@ -6,8 +6,8 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-08-13 23:18:35
-;; Version: 0.6
-;; Last-Updated: 2018-08-14 13:01:42
+;; Version: 0.7
+;; Last-Updated: 2018-08-14 13:16:08
 ;;           By: Andy Stewart
 ;; URL: http://www.emacswiki.org/emacs/download/aweshell.el
 ;; Keywords:
@@ -91,6 +91,7 @@
 ;;      * Refacotry code.
 ;;      * Fix error "wrong-type-argument stringp nil" by `aweshell-validate-command'
 ;;      * Add some handy aliases.
+;;      * Make `aweshell-validate-command' works with eshell aliases.
 ;;
 ;; 2018/08/13
 ;;      * First released.
@@ -135,6 +136,16 @@
 
 (defcustom aweshell-sudo-toggle-key "C-S-l"
   "The keystroke for toggle sudo"
+  :type 'string
+  :group 'aweshell)
+
+(defcustom aweshell-valid-command-color "#98C379"
+  "The color of valid command by `aweshell-validate-command'."
+  :type 'string
+  :group 'aweshell)
+
+(defcustom aweshell-invalid-command-color "#FF0000"
+  "The color of valid command by `aweshell-validate-command'."
   :type 'string
   :group 'aweshell)
 
@@ -299,10 +310,18 @@ Create new one if no eshell buffer exists."
           (end (match-end 1))
           (command (match-string 1)))
       (when command
-        (put-text-property beg end
-                           'face `(:foreground ,(if (executable-find command)
-                                                    "#98C379"
-                                                  "red")))))))
+        (put-text-property
+         beg end
+         'face `(:foreground
+                 ,(if
+                      (or
+                       ;; Command is exists?
+                       (executable-find command)
+                       ;; Or command is alias?
+                       (seq-contains (eshell-alias-completions "") command))
+                      aweshell-valid-command-color
+                    aweshell-invalid-command-color)))))))
+
 (add-hook 'eshell-mode-hook
           (lambda ()
             (add-hook 'post-command-hook #'aweshell-validate-command t t)))
