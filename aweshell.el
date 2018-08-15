@@ -296,7 +296,7 @@ Create new one if no eshell buffer exists."
            (input (eshell-get-old-input))
            (esh-history (when (> (ring-size eshell-history-ring) 0)
                           (ring-elements eshell-history-ring)))
-           (all-shell-history (append esh-history (esh-parse-zsh-history) (aweshell-parse-bash-history))))
+           (all-shell-history (append esh-history (esh-parse-zsh-history) (esh-parse-bash-history))))
       (let* ((command (completing-read "Search history: " all-shell-history)))
         (eshell-kill-input)
         (insert command)
