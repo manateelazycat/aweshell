@@ -6,8 +6,8 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-08-13 23:18:35
-;; Version: 1.7
-;; Last-Updated: 2018-08-16 08:52:44
+;; Version: 1.8
+;; Last-Updated: 2018-08-16 09:10:29
 ;;           By: Andy Stewart
 ;; URL: http://www.emacswiki.org/emacs/download/aweshell.el
 ;; Keywords:
@@ -96,6 +96,7 @@
 ;;
 ;; 2018/08/16
 ;;      * Just run git relative code when git in exec-path.
+;;      * Use `esh-parse-shell-history' refacotry code.
 ;;
 ;; 2018/08/15
 ;;      * Remove face settings.
@@ -297,9 +298,7 @@ Create new one if no eshell buffer exists."
   (save-excursion
     (let* ((start-pos (eshell-beginning-of-input))
            (input (eshell-get-old-input))
-           (esh-history (when (> (ring-size eshell-history-ring) 0)
-                          (ring-elements eshell-history-ring)))
-           (all-shell-history (append esh-history (esh-parse-zsh-history) (esh-parse-bash-history))))
+           (all-shell-history (esh-parse-shell-history)))
       (let* ((command (completing-read "Search history: " all-shell-history)))
         (eshell-kill-input)
         (insert command)

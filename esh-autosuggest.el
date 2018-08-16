@@ -65,56 +65,53 @@ respectively."
 
 (defun esh-parse-bash-history ()
   "Parse the bash history."
-  (let (collection bash_history)
-    (shell-command "history -r")        ; reload history
-    (setq collection
-          (nreverse
-           (split-string (with-temp-buffer (insert-file-contents (file-truename "~/.bash_history"))
-                                           (buffer-string))
-                         "\n"
-                         t)))
-    (when (and collection (> (length collection) 0)
-               (setq bash_history collection))
-      bash_history)))
+  (if (file-exists-p "~/.bash_history")
+      (let (collection bash_history)
+        (shell-command "history -r")    ; reload history
+        (setq collection
+              (nreverse
+               (split-string (with-temp-buffer (insert-file-contents (file-truename "~/.bash_history"))
+                                               (buffer-string))
+                             "\n"
+                             t)))
+        (when (and collection (> (length collection) 0)
+                   (setq bash_history collection))
+          bash_history))
+    nil))
 
 (defun esh-parse-zsh-history ()
   "Parse the bash history."
-  (let (collection zsh_history)
-    (shell-command "history -r")        ; reload history
-    (setq collection
-          (nreverse
-           (split-string (with-temp-buffer (insert-file-contents (file-truename "~/.zsh_history"))
-                                           (replace-regexp-in-string "^:[^;]*;" "" (buffer-string)))
-                         "\n"
-                         t)))
-    (when (and collection (> (length collection) 0)
-               (setq zsh_history collection))
-      zsh_history)))
+  (if (file-exists-p "~/.zsh_history")
+      (let (collection zsh_history)
+        (shell-command "history -r")    ; reload history
+        (setq collection
+              (nreverse
+               (split-string (with-temp-buffer (insert-file-contents (file-truename "~/.zsh_history"))
+                                               (replace-regexp-in-string "^:[^;]*;" "" (buffer-string)))
+                             "\n"
+                             t)))
+        (when (and collection (> (length collection) 0)
+                   (setq zsh_history collection))
+          zsh_history))
+    nil))
+
+(defun esh-parse-shell-history ()
+  "Parse history from eshell/bash/zsh/ ."
+  (delete-dups
+   (mapcar
+    (lambda (str)
+      (string-trim (substring-no-properties str)))
+    (append
+     (ring-elements eshell-history-ring)
+     (esh-parse-bash-history)
+     (esh-parse-zsh-history)))))
 
 (defun esh-autosuggest-candidates (prefix)
   "Select the first eshell history candidate that starts with PREFIX."
-  (let* ((history
-          (delete-dups
-           (mapcar (lambda (str)
-                     (string-trim (substring-no-properties str)))
-                   (ring-elements eshell-history-ring))))
-         (bash-history
-          (delete-dups
-           (mapcar (lambda (str)
-                     (string-trim (substring-no-properties str)))
-                   (esh-parse-bash-history))))
-         (zsh-history
-          (delete-dups
-           (mapcar (lambda (str)
-                     (string-trim (substring-no-properties str)))
-                   (esh-parse-zsh-history))))
-         (most-similar (cl-find-if
+  (let* ((most-similar (cl-find-if
                         (lambda (str)
                           (string-prefix-p prefix str))
-                        (append
-                         history
-                         bash-history
-                         zsh-history))))
+                        (esh-parse-shell-history))))
     (when most-similar
       `(,most-similar))))
 
