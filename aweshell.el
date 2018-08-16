@@ -6,8 +6,8 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-08-13 23:18:35
-;; Version: 1.8
-;; Last-Updated: 2018-08-16 09:10:29
+;; Version: 1.9
+;; Last-Updated: 2018-08-16 21:04:23
 ;;           By: Andy Stewart
 ;; URL: http://www.emacswiki.org/emacs/download/aweshell.el
 ;; Keywords:
@@ -97,6 +97,7 @@
 ;; 2018/08/16
 ;;      * Just run git relative code when git in exec-path.
 ;;      * Use `esh-parse-shell-history' refacotry code.
+;;      * Try to fix error "Shell command failed with code 1 and no output" cause by LANG environment variable.
 ;;
 ;; 2018/08/15
 ;;      * Remove face settings.
@@ -386,7 +387,7 @@ Create new one if no eshell buffer exists."
     (with-temp-buffer
       (call-process-shell-command "git" nil (current-buffer) nil "help" "--all")
       (goto-char 0)
-      (search-forward "available git commands in")
+      (search-forward "\n\n")
       (let (commands)
         (while (re-search-forward
                 "^[[:blank:]]+\\([[:word:]-.]+\\)[[:blank:]]*\\([[:word:]-.]+\\)?"
