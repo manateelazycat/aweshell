@@ -67,7 +67,8 @@ respectively."
   "Parse the bash history."
   (if (file-exists-p "~/.bash_history")
       (let (collection bash_history)
-        (shell-command "history -r")    ; reload history
+        (let ((inhibit-message t))
+          (shell-command "history -r ~/.bash_history")) ; reload history
         (setq collection
               (nreverse
                (split-string (with-temp-buffer (insert-file-contents (file-truename "~/.bash_history"))
@@ -83,7 +84,8 @@ respectively."
   "Parse the bash history."
   (if (file-exists-p "~/.zsh_history")
       (let (collection zsh_history)
-        (shell-command "history -r")    ; reload history
+        (let ((inhibit-message t))
+          (shell-command "history -r ~/.zsh_history")) ; reload history
         (setq collection
               (nreverse
                (split-string (with-temp-buffer (insert-file-contents (file-truename "~/.zsh_history"))
