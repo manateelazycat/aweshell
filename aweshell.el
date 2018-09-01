@@ -358,10 +358,13 @@ Create new one if no eshell buffer exists."
          'face `(:foreground
                  ,(if
                       (or
-                       ;; Command is exists?
+                       ;; Command exists?
                        (executable-find command)
-                       ;; Or command is alias?
-                       (seq-contains (eshell-alias-completions "") command))
+                       ;; Or command is an alias?
+                       (seq-contains (eshell-alias-completions "") command)
+                       ;; Or it is ../. ?
+                       (or (equal command "..")
+                           (equal command ".")))
                       aweshell-valid-command-color
                     aweshell-invalid-command-color)))))))
 
