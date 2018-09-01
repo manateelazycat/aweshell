@@ -63,11 +63,19 @@ respectively."
   "Keymap that is enabled during an active history
   autosuggestion.")
 
+(defun esh-reload-shell-history ()
+  (with-temp-message ""
+    (let* ((shell-command (getenv "SHELL")))
+      (cond ((string-equal shell-command "/bin/bash")
+             (shell-command "history -r"))
+            ((string-equal shell-command "/bin/zsh")
+             (shell-command "fc -W; fc -R"))))))
+
 (defun esh-parse-bash-history ()
   "Parse the bash history."
   (if (file-exists-p "~/.bash_history")
       (let (collection bash_history)
-        (shell-command "history -r")    ; reload history
+        (esh-reload-shell-history)
         (setq collection
               (nreverse
                (split-string (with-temp-buffer (insert-file-contents (file-truename "~/.bash_history"))
@@ -83,7 +91,7 @@ respectively."
   "Parse the bash history."
   (if (file-exists-p "~/.zsh_history")
       (let (collection zsh_history)
-        (shell-command "history -r")    ; reload history
+        (esh-reload-shell-history)
         (setq collection
               (nreverse
                (split-string (with-temp-buffer (insert-file-contents (file-truename "~/.zsh_history"))
