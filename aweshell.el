@@ -235,6 +235,14 @@
       nil)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Interactive Functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun aweshell-toggle ()
+  "Toggle Aweshell."
+  (interactive)
+  (if (equal major-mode 'eshell-mode)
+      (switch-to-prev-buffer)
+    (aweshell-next)))
+
 (defun aweshell-new ()
   "Create new eshell buffer."
   (interactive)
