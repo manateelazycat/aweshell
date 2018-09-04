@@ -315,16 +315,6 @@ Create new one if no eshell buffer exists."
             (define-key eshell-mode-map (kbd aweshell-search-history-key) 'aweshell-search-history)
             ))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Handy aliases ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(add-hook 'eshell-mode-hook
-          (lambda ()
-            (eshell/alias "f" "find-file $1")
-            (eshell/alias "fo" "find-file-other-window $1")
-            (eshell/alias "d" "dired $1")
-            (eshell/alias "clear" "aweshell-clear-buffer")
-            (eshell/alias "ll" "ls -al")
-            ))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; EShell extensions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; eshell-prompt-extras
