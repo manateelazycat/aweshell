@@ -51,11 +51,6 @@
 ;; 6. Change buffer name by directory change.
 ;; 7. Add completions for git command.
 ;; 8. Fix error `command not found' in MacOS.
-;; 9. Build-in some handy alias, such as:
-;;    f (find-file)
-;;    fo (find-file-other-window)
-;;    d (dired)
-;;    ll (ls -al)
 ;;
 
 ;;; Installation:

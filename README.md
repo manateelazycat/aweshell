@@ -8,10 +8,12 @@ So I wrote `aweshell.el` to extend `eshell` with these features:
 
 1. Create and manage multiple eshell buffers.
 2. Add some useful commands, such as: clear buffer, toggle sudo etc.
-3. Display extra information and color like zsh, powered by `eshell-prompt-extras`
-4. Add Fish-like history autosuggestions, powered by `esh-autosuggest`
+3. Display extra information and color like zsh, powered by `eshell-prompt-extras'
+4. Add Fish-like history autosuggestions, powered by `esh-autosuggest', support histories from bash/zsh/eshell.
 5. Validate and highlight command before post to eshell.
-6. Fix error `command not found` in MacOS.
+6. Change buffer name by directory change.
+7. Add completions for git command.
+8. Fix error `command not found' in MacOS.
 
 # Installation
 
