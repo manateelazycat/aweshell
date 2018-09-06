@@ -6,8 +6,8 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-08-13 23:18:35
-;; Version: 1.9
-;; Last-Updated: 2018-08-16 21:04:23
+;; Version: 2.0
+;; Last-Updated: 2018-09-06 08:33:42
 ;;           By: Andy Stewart
 ;; URL: http://www.emacswiki.org/emacs/download/aweshell.el
 ;; Keywords:
@@ -15,7 +15,7 @@
 ;;
 ;; Features that might be required by this library:
 ;;
-;; `eshell' `eshell-prompt-extras' `esh-autosuggest' `exec-path-from-shell'
+;; `eshell' `eshell-prompt-extras' `esh-autosuggest' `exec-path-from-shell' `cl'
 ;;
 
 ;;; This file is NOT part of GNU Emacs
@@ -89,6 +89,9 @@
 
 ;;; Change log:
 ;;
+;; 2018/09/06
+;;      * Require `cl' to fix function `subseq' definition.
+;;
 ;; 2018/08/16
 ;;      * Just run git relative code when git in exec-path.
 ;;      * Use `esh-parse-shell-history' refacotry code.
@@ -130,6 +133,7 @@
 
 ;;; Require
 (require 'eshell)
+(require 'cl)
 
 ;;; Code:
 
