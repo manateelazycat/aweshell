@@ -383,8 +383,8 @@ Create new one if no eshell buffer exists."
 
 (defalias 'eshell/e 'aweshell-emacs)
 
-(defun aweshell-unpack (file)
-  "Unpack FILE with default unpack command."
+(defun aweshell-unpack (file &rest args)
+  "Unpack FILE with ARGS."
   (let ((command (some (lambda (x)
                          (if (string-match-p (car x) file)
                              (cadr x)))
@@ -399,7 +399,10 @@ Create new one if no eshell buffer exists."
                          (".*\.zip" "unzip")
                          (".*\.Z" "uncompress")
                          (".*" "echo 'Could not unpack the file:'")))))
-    (eshell-command-result (concat command " " file))))
+    (let ((unpack-command(concat command " " file " " (mapconcat 'identity args " "))))
+      (eshell/printnl "Unpack command: " unpack-command)
+      (eshell-command-result unpack-command))
+    ))
 
 (defalias 'eshell/unpack 'aweshell-unpack)
 
