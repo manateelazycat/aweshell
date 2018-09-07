@@ -369,6 +369,42 @@ Create new one if no eshell buffer exists."
           (lambda ()
             (add-hook 'post-command-hook #'aweshell-validate-command t t)))
 
+(defun aweshell-emacs (&rest args)
+  "Open a file in Emacs with ARGS, Some habits die hard."
+  (if (null args)
+      ;; If I just ran "emacs", I probably expect to be launching
+      ;; Emacs, which is rather silly since I'm already in Emacs.
+      ;; So just pretend to do what I ask.
+      (bury-buffer)
+    ;; We have to expand the file names or else naming a directory in an
+    ;; argument causes later arguments to be looked for in that directory,
+    ;; not the starting directory
+    (mapc #'find-file (mapcar #'expand-file-name (eshell-flatten-list (reverse args))))))
+
+(defalias 'eshell/e 'aweshell-emacs)
+
+(defun aweshell-unpack (file &rest args)
+  "Unpack FILE with ARGS."
+  (let ((command (some (lambda (x)
+                         (if (string-match-p (car x) file)
+                             (cadr x)))
+                       '((".*\.tar.bz2" "tar xjf")
+                         (".*\.tar.gz" "tar xzf")
+                         (".*\.bz2" "bunzip2")
+                         (".*\.rar" "unrar x")
+                         (".*\.gz" "gunzip")
+                         (".*\.tar" "tar xf")
+                         (".*\.tbz2" "tar xjf")
+                         (".*\.tgz" "tar xzf")
+                         (".*\.zip" "unzip")
+                         (".*\.Z" "uncompress")
+                         (".*" "echo 'Could not unpack the file:'")))))
+    (let ((unpack-command(concat command " " file " " (mapconcat 'identity args " "))))
+      (eshell/printnl "Unpack command: " unpack-command)
+      (eshell-command-result unpack-command))
+    ))
+
+(defalias 'eshell/unpack 'aweshell-unpack)
 
 ;; Synchronal buffer name by directory change.
 (defun aweshell-sync-dir-buffer-name ()
