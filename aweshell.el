@@ -6,8 +6,8 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-08-13 23:18:35
-;; Version: 2.0
-;; Last-Updated: 2018-09-06 08:33:42
+;; Version: 2.1
+;; Last-Updated: 2018-09-07 16:57:13
 ;;           By: Andy Stewart
 ;; URL: http://www.emacswiki.org/emacs/download/aweshell.el
 ;; Keywords:
@@ -51,6 +51,9 @@
 ;; 6. Change buffer name by directory change.
 ;; 7. Add completions for git command.
 ;; 8. Fix error `command not found' in MacOS.
+;; 9. Integrate `eshell-up'.
+;; 10. Unpack archive file.
+;; 11. Open file with alias e.
 ;;
 
 ;;; Installation:
@@ -88,6 +91,9 @@
 ;;
 
 ;;; Change log:
+;;
+;; 2018/09/07
+;;      * Add docs about `eshell-up', `aweshell-emacs' and `aweshell-unpack'
 ;;
 ;; 2018/09/06
 ;;      * Require `cl' to fix function `subseq' definition.

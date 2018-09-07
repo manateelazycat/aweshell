@@ -14,6 +14,9 @@ So I wrote `aweshell.el` to extend `eshell` with these features:
 6. Change buffer name by directory change.
 7. Add completions for git command.
 8. Fix error `command not found' in MacOS.
+9. Integrate `eshell-up'.
+10. Unpack archive file.
+11. Open file with alias e.
 
 # Installation
 
