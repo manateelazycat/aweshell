@@ -326,8 +326,9 @@ Create new one if no eshell buffer exists."
 
 ;; eshell-up.el
 ;; Quickly go to a specific parent directory in eshell
-(autoload 'eshell-up "eshell-up")
-(autoload 'eshell-up-peek "eshell-up")
+(require 'eshell-up)
+(defalias 'eshell/up 'eshell-up)
+(defalias 'eshell/up-peek 'eshell-up-peek)
 
 ;; eshell-prompt-extras
 ;; Display extra information and color for your eshell prompt.
