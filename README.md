@@ -49,3 +49,19 @@ aweshell-sudo-toggle-key
 ```
 
 Customize prompt as directed in [eshell-prompt-extras' README](https://github.com/kaihaosw/eshell-prompt-extras#themes).
+
+## Aliases
+
+[eshell-up](https://github.com/peterwvj/eshell-up)
+
+In alias file:
+```
+alias up eshell-up $1
+alias pk eshell-up-peek $1
+```
+
+Other customization of eshell-up:
+```Elisp
+(setq eshell-up-ignore-case nil)
+(setq eshell-up-print-parent-dir t)
+```
