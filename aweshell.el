@@ -482,6 +482,11 @@ Create new one if no eshell buffer exists."
       (while (pcomplete-here (pcomplete-entries))))))
   )
 
+;; eshell-did-you-mean
+;; command not found (“did you mean…” feature) in Eshell.
+(require 'eshell-did-you-mean)
+(eshell-did-you-mean-setup)
+
 (provide 'aweshell)
 
 ;;; aweshell.el ends here
