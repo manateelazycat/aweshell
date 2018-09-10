@@ -6,8 +6,8 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-08-13 23:18:35
-;; Version: 2.2
-;; Last-Updated: 2018-09-10 10:31:42
+;; Version: 2.3
+;; Last-Updated: 2018-09-10 10:38:19
 ;;           By: Andy Stewart
 ;; URL: http://www.emacswiki.org/emacs/download/aweshell.el
 ;; Keywords:
@@ -55,6 +55,7 @@
 ;; 10. Unpack archive file.
 ;; 11. Open file with alias e.
 ;; 12. Output "did you mean ..." helper when you typo.
+;; 13. Make cat file with syntax highlight.
 
 ;;; Installation:
 ;;
@@ -97,6 +98,7 @@
 ;;
 ;; 2018/09/07
 ;;      * Add docs about `eshell-up', `aweshell-emacs' and `aweshell-unpack'
+;;      * Add `aweshell-cat-with-syntax-highlight' make cat file with syntax highlight.
 ;;
 ;; 2018/09/06
 ;;      * Require `cl' to fix function `subseq' definition.
@@ -489,6 +491,24 @@ Create new one if no eshell buffer exists."
 ;; command not found (“did you mean…” feature) in Eshell.
 (require 'eshell-did-you-mean)
 (eshell-did-you-mean-setup)
+
+;; Make cat with syntax highlight.
+(defun aweshell-cat-with-syntax-highlight (filename)
+  "Like cat(1) but with syntax highlighting."
+  (let ((existing-buffer (get-file-buffer filename))
+        (buffer (find-file-noselect filename)))
+    (eshell-print
+     (with-current-buffer buffer
+       (if (fboundp 'font-lock-ensure)
+           (font-lock-ensure)
+         (with-no-warnings
+           (font-lock-fontify-buffer)))
+       (buffer-string)))
+    (unless existing-buffer
+      (kill-buffer buffer))
+    nil))
+
+(advice-add 'eshell/cat :override #'aweshell-cat-with-syntax-highlight)
 
 (provide 'aweshell)
 

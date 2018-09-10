@@ -18,6 +18,7 @@ So I wrote `aweshell.el` to extend `eshell` with these features:
 10. Unpack archive file.
 11. Open file with alias e.
 12. Output "did you mean ..." helper when you typo.
+13. Make cat file with syntax highlight.
 
 # Installation
 
