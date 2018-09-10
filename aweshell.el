@@ -6,8 +6,8 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-08-13 23:18:35
-;; Version: 2.1
-;; Last-Updated: 2018-09-07 16:57:13
+;; Version: 2.2
+;; Last-Updated: 2018-09-10 10:31:42
 ;;           By: Andy Stewart
 ;; URL: http://www.emacswiki.org/emacs/download/aweshell.el
 ;; Keywords:
@@ -54,7 +54,7 @@
 ;; 9. Integrate `eshell-up'.
 ;; 10. Unpack archive file.
 ;; 11. Open file with alias e.
-;;
+;; 12. Output "did you mean ..." helper when you typo.
 
 ;;; Installation:
 ;;
@@ -91,6 +91,9 @@
 ;;
 
 ;;; Change log:
+;;
+;; 2018/09/10
+;;      * Built-in `eshell-did-you-mean' plugin.
 ;;
 ;; 2018/09/07
 ;;      * Add docs about `eshell-up', `aweshell-emacs' and `aweshell-unpack'
