@@ -6,8 +6,8 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-08-13 23:18:35
-;; Version: 2.3
-;; Last-Updated: 2018-09-10 10:38:19
+;; Version: 2.4
+;; Last-Updated: 2018-09-17 10:44:51
 ;;           By: Andy Stewart
 ;; URL: http://www.emacswiki.org/emacs/download/aweshell.el
 ;; Keywords:
@@ -92,6 +92,9 @@
 ;;
 
 ;;; Change log:
+;;
+;; 2018/09/17
+;;      * Use `ido-completing-read' instead `completing-read' to provide fuzz match.
 ;;
 ;; 2018/09/10
 ;;      * Built-in `eshell-did-you-mean' plugin.
@@ -318,7 +321,7 @@ Create new one if no eshell buffer exists."
     (let* ((start-pos (eshell-beginning-of-input))
            (input (eshell-get-old-input))
            (all-shell-history (esh-parse-shell-history)))
-      (let* ((command (completing-read "Search history: " all-shell-history)))
+      (let* ((command (ido-completing-read "Search history: " all-shell-history)))
         (eshell-kill-input)
         (insert command)
         )))
