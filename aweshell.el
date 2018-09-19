@@ -155,6 +155,8 @@
 ;;; Code:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; OS Config ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defvar aweshell-use-exec-path-from-shell t)
+
 (when (and aweshell-use-exec-path-from-shell
            (featurep 'cocoa))
   ;; Initialize environment from user's shell to make eshell know every PATH by other shell.
@@ -166,10 +168,6 @@
   "Multi eshell manager."
   :group 'aweshell)
 
-(defcustom aweshell-use-exec-path-from-shell t
-  "Whether to use `exec-path-from-shell' to set PATH variable."
-  :type 'boolean
-  :group aweshell)
 (defcustom aweshell-complete-selection-key "M-h"
   "The keystroke for complete history auto-suggestions."
   :type 'string
