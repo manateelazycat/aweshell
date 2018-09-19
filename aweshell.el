@@ -86,12 +86,15 @@
 ;;
 ;; `aweshell-valid-command-color'
 ;; `aweshell-invalid-command-color'
+;; `aweshell-use-exec-path-from-shell'
 ;;
 ;; All of the above can customize by:
 ;;      M-x customize-group RET aweshell RET
 ;;
 
 ;;; Change log:
+;; 2018/09/19
+;;      * Make `exec-path-from-shell' optional. Disable with variable`aweshell-use-exec-path-from-shell'.
 ;;
 ;; 2018/09/17
 ;;      * Use `ido-completing-read' instead `completing-read' to provide fuzz match.
@@ -152,7 +155,8 @@
 ;;; Code:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; OS Config ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(when (featurep 'cocoa)
+(when (and aweshell-use-exec-path-from-shell
+           (featurep 'cocoa))
   ;; Initialize environment from user's shell to make eshell know every PATH by other shell.
   (require 'exec-path-from-shell)
   (exec-path-from-shell-initialize))
@@ -162,6 +166,10 @@
   "Multi eshell manager."
   :group 'aweshell)
 
+(defcustom aweshell-use-exec-path-from-shell t
+  "Whether to use `exec-path-from-shell' to set PATH variable."
+  :type 'boolean
+  :group aweshell)
 (defcustom aweshell-complete-selection-key "M-h"
   "The keystroke for complete history auto-suggestions."
   :type 'string

@@ -51,6 +51,7 @@ M-x customize-group RET aweshell RET
 aweshell-complete-selection-key
 aweshell-clear-buffer-key
 aweshell-sudo-toggle-key
+aweshell-use-exec-path-from-shell
 ```
 
 Customize prompt as directed in [eshell-prompt-extras' README](https://github.com/kaihaosw/eshell-prompt-extras#themes).
