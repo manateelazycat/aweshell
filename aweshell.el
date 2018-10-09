@@ -57,7 +57,7 @@
 ;; 12. Output "did you mean ..." helper when you typo.
 ;; 13. Make cat file with syntax highlight.
 ;; 14. Alert user when background process finished or aborted.
-;; 
+;;
 
 ;;; Installation:
 ;;
@@ -95,9 +95,9 @@
 ;;
 
 ;;; Change log:
-;;; 
+;;;
 ;; 2018/10/19
-;;	* Alert user when background process finished or aborted.
+;;      * Alert user when background process finished or aborted.
 ;;
 ;; 2018/09/19
 ;;      * Make `exec-path-from-shell' optional. Disable with variable`aweshell-use-exec-path-from-shell'.
@@ -545,7 +545,7 @@ Create new one if no eshell buffer exists."
          (buffer-visible (member buffer (mapcar #'window-buffer (window-list)))))
     (unless buffer-visible
       (message "%s %s"
-               (propertize (buffer-name buffer) 'face 'aweshell-alert-buffer-face)
+               (propertize (format "[Aweshell Alert] %s" (string-remove-prefix "Aweshell: " (buffer-name buffer))) 'face 'aweshell-alert-buffer-face)
                (propertize msg 'face 'aweshell-alert-command-face)))))
 
 (add-hook 'eshell-kill-hook #'eshell-command-alert)
