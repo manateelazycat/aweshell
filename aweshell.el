@@ -261,7 +261,8 @@
   "Toggle Aweshell."
   (interactive)
   (if (equal major-mode 'eshell-mode)
-      (switch-to-prev-buffer)
+      (while (equal major-mode 'eshell-mode)
+        (switch-to-prev-buffer))
     (aweshell-next)))
 
 (defun aweshell-new ()
