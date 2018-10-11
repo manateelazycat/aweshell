@@ -6,8 +6,8 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-08-13 23:18:35
-;; Version: 2.4
-;; Last-Updated: 2018-09-17 10:44:51
+;; Version: 2.5
+;; Last-Updated: 2018-10-09 20:53:13
 ;;           By: Andy Stewart
 ;; URL: http://www.emacswiki.org/emacs/download/aweshell.el
 ;; Keywords:
@@ -15,7 +15,7 @@
 ;;
 ;; Features that might be required by this library:
 ;;
-;; `eshell' `eshell-prompt-extras' `esh-autosuggest' `exec-path-from-shell' `cl'
+;; `eshell' `eshell-prompt-extras' `esh-autosuggest' `exec-path-from-shell' `cl' `subr-x'
 ;;
 
 ;;; This file is NOT part of GNU Emacs
@@ -56,6 +56,8 @@
 ;; 11. Open file with alias e.
 ;; 12. Output "did you mean ..." helper when you typo.
 ;; 13. Make cat file with syntax highlight.
+;; 14. Alert user when background process finished or aborted.
+;;
 
 ;;; Installation:
 ;;
@@ -93,6 +95,10 @@
 ;;
 
 ;;; Change log:
+;;;
+;; 2018/10/19
+;;      * Alert user when background process finished or aborted.
+;;
 ;; 2018/09/19
 ;;      * Make `exec-path-from-shell' optional. Disable with variable`aweshell-use-exec-path-from-shell'.
 ;;
@@ -151,10 +157,13 @@
 ;;; Require
 (require 'eshell)
 (require 'cl)
+(require 'subr-x)
 
 ;;; Code:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; OS Config ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defvar aweshell-use-exec-path-from-shell t)
+
 (when (and aweshell-use-exec-path-from-shell
            (featurep 'cocoa))
   ;; Initialize environment from user's shell to make eshell know every PATH by other shell.
@@ -166,10 +175,6 @@
   "Multi eshell manager."
   :group 'aweshell)
 
-(defcustom aweshell-use-exec-path-from-shell t
-  "Whether to use `exec-path-from-shell' to set PATH variable."
-  :type 'boolean
-  :group aweshell)
 (defcustom aweshell-complete-selection-key "M-h"
   "The keystroke for complete history auto-suggestions."
   :type 'string
@@ -198,6 +203,16 @@
 (defcustom aweshell-invalid-command-color "#FF0000"
   "The color of invalid command by `aweshell-validate-command'."
   :type 'string
+  :group 'aweshell)
+
+(defface aweshell-alert-buffer-face
+  '((t (:foreground "SystemPinkColor" :bold t)))
+  "Alert buffer face."
+  :group 'aweshell)
+
+(defface aweshell-alert-command-face
+  '((t (:foreground "SystemOrangeColor" :bold t)))
+  "Alert command face."
   :group 'aweshell)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Variable ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -521,6 +536,20 @@ Create new one if no eshell buffer exists."
     nil))
 
 (advice-add 'eshell/cat :override #'aweshell-cat-with-syntax-highlight)
+
+;; Alert user when background process finished or aborted.
+(defun eshell-command-alert (process status)
+  "Send `alert' with severity based on STATUS when PROCESS finished."
+  (let* ((cmd (process-command process))
+         (buffer (process-buffer process))
+         (msg (replace-regexp-in-string "\n" " " (string-trim (format "%s: %s" (mapconcat 'identity cmd " ")  status))))
+         (buffer-visible (member buffer (mapcar #'window-buffer (window-list)))))
+    (unless buffer-visible
+      (message "%s %s"
+               (propertize (format "[Aweshell Alert] %s" (string-remove-prefix "Aweshell: " (buffer-name buffer))) 'face 'aweshell-alert-buffer-face)
+               (propertize msg 'face 'aweshell-alert-command-face)))))
+
+(add-hook 'eshell-kill-hook #'eshell-command-alert)
 
 (provide 'aweshell)
 
