@@ -405,7 +405,9 @@ Create new one if no eshell buffer exists."
                        (seq-contains (eshell-alias-completions "") command)
                        ;; Or it is ../. ?
                        (or (equal command "..")
-                           (equal command ".")))
+                           (equal command ".")
+                           (equal command "exit")
+                           ))
                       aweshell-valid-command-color
                     aweshell-invalid-command-color)))))))
 
