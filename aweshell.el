@@ -387,7 +387,7 @@ Create new one if no eshell buffer exists."
 (defun aweshell-validate-command ()
   (save-excursion
     (beginning-of-line)
-    (re-search-forward (format "%s\\([^ ]*\\)" eshell-prompt-regexp)
+    (re-search-forward (format "%s\\([^ \t\r\n\v\f]*\\)" eshell-prompt-regexp)
                        (line-end-position)
                        t)
     (let ((beg (match-beginning 1))
@@ -406,10 +406,12 @@ Create new one if no eshell buffer exists."
                        ;; Or it is ../. ?
                        (or (equal command "..")
                            (equal command ".")
-                           (equal command "exit")
-                           ))
+                           (equal command "exit"))
+                       ;; Or it is a file in current dir?
+                       (member (file-name-base command) (directory-files default-directory)))
                       aweshell-valid-command-color
-                    aweshell-invalid-command-color)))))))
+                    aweshell-invalid-command-color)))
+        (put-text-property beg end 'rear-nonsticky t)))))
 
 (add-hook 'eshell-mode-hook
           (lambda ()
