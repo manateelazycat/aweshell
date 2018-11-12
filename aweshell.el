@@ -6,8 +6,8 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-08-13 23:18:35
-;; Version: 2.5
-;; Last-Updated: 2018-10-09 20:53:13
+;; Version: 2.6
+;; Last-Updated: 2018-11-12 18:40:59
 ;;           By: Andy Stewart
 ;; URL: http://www.emacswiki.org/emacs/download/aweshell.el
 ;; Keywords:
@@ -96,6 +96,10 @@
 
 ;;; Change log:
 ;;;
+;;
+;; 2018/11/12
+;;	* Remove Mac color, use hex color instead.
+;;
 ;; 2018/10/19
 ;;      * Alert user when background process finished or aborted.
 ;;
@@ -206,12 +210,12 @@
   :group 'aweshell)
 
 (defface aweshell-alert-buffer-face
-  '((t (:foreground "SystemPinkColor" :bold t)))
+  '((t (:foreground "#ff2d55" :bold t)))
   "Alert buffer face."
   :group 'aweshell)
 
 (defface aweshell-alert-command-face
-  '((t (:foreground "SystemOrangeColor" :bold t)))
+  '((t (:foreground "#ff9500" :bold t)))
   "Alert command face."
   :group 'aweshell)
 
