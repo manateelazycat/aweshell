@@ -408,7 +408,9 @@ Create new one if no eshell buffer exists."
                            (equal command ".")
                            (equal command "exit"))
                        ;; Or it is a file in current dir?
-                       (member (file-name-base command) (directory-files default-directory)))
+                       (member (file-name-base command) (directory-files default-directory))
+                       ;; Or it is a elisp function
+                       (functionp (intern command)))
                       aweshell-valid-command-color
                     aweshell-invalid-command-color)))
         (put-text-property beg end 'rear-nonsticky t)))))
