@@ -272,13 +272,33 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Interactive Functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun aweshell-toggle ()
-  "Toggle Aweshell."
-  (interactive)
+(defun aweshell-toggle (&optional arg)
+  "Toggle Aweshell.
+If called with prefix argument, open Aweshell buffer in current directory when toggling on Aweshell. If there exists an Aweshell buffer with current directory, use that, otherwise create one."
+  (interactive "p")
   (if (equal major-mode 'eshell-mode)
+      ;; toggle off
       (while (equal major-mode 'eshell-mode)
         (switch-to-prev-buffer))
-    (aweshell-next)))
+    ;; toggle on
+    (if arg
+        ;; open in current dir
+        (let* ((dir default-directory)
+               (existing-buffer
+                (catch 'found
+                  (dolist (aweshell-buffer aweshell-buffer-list)
+                    (with-current-buffer aweshell-buffer
+                      (when (equal dir default-directory)
+                        (throw 'found aweshell-buffer)))))))
+          ;; found the buffer with the same dir
+          ;; or create a new one
+          (if existing-buffer
+              (switch-to-buffer existing-buffer)
+            (message "No Aweshell buffer with current dir found, creating a new one.")
+            (switch-to-buffer (car (last (aweshell-new))))
+            (eshell/cd dir)))
+      ;; simply open
+      (aweshell-next))))
 
 (defun aweshell-new ()
   "Create new eshell buffer."
