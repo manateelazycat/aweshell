@@ -281,7 +281,7 @@ If called with prefix argument, open Aweshell buffer in current directory when t
       (while (equal major-mode 'eshell-mode)
         (switch-to-prev-buffer))
     ;; toggle on
-    (if arg
+    (if (eq arg 4)
         ;; open in current dir
         (let* ((dir default-directory)
                (existing-buffer
