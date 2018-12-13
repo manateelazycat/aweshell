@@ -164,6 +164,73 @@ respectively."
                  (esh-autosuggest--prefix)))
     (candidates (esh-autosuggest-candidates arg))))
 
+;;;; Companyless
+
+(defvar esh-autosuggest--companyless-overlay nil
+  "Overlay used to display auto suggestion")
+
+(defface esh-autosuggest-companyless '((((background dark)) . (:foreground "gray50"))
+                                       (((background light)) . (:foreground "silver")))
+  "Face of auto suggestion when using companyless mode.")
+
+(defvar esh-autosuggest--companyless-override-map (let ((map (make-sparse-keymap)))
+                                                    (define-key map (kbd "C-f") #'esh-autosuggest--companyless-complete)
+                                                    map)
+  "The map used on overlay so you can complete with C-f.")
+
+(defun esh-autosuggest--companyless-post-command-hook ()
+  "Add autosuggest to overlay."
+  (when (and eshell-mode
+             (not (minibufferp)))
+    ;; remove overlay and later (if needed) create a new one
+    (when esh-autosuggest--companyless-overlay
+      (delete-overlay esh-autosuggest--companyless-overlay)
+      (setq esh-autosuggest--companyless-overlay nil))
+    (define-key esh-autosuggest-companyless-mode-map
+      (kbd "C-f") nil)
+    (let ((prefix (if (or (eq (char-after) nil) ; only complete when at end of symbol
+                          (eq (char-after) ?\n))
+                      (esh-autosuggest--prefix)
+                    'stop))
+          suggest)
+      (when (and (not (eq prefix 'stop))
+                 (setq suggest (car (esh-autosuggest-candidates prefix))))
+        (setq esh-autosuggest--companyless-overlay
+              (make-overlay (point) (point)))
+        (define-key esh-autosuggest-companyless-mode-map
+          (kbd "C-f") #'esh-autosuggest--companyless-complete)
+        (overlay-put
+         esh-autosuggest--companyless-overlay
+         'after-string ; use after sting to display suggestion
+         (propertize (substring suggest (length prefix)) ; remove prefix from suggestion
+                     ;; without 'cursor property, the cursor is displayed at the end of
+                     ;; the overlay
+                     'cursor 0 'face 'esh-autosuggest-companyless))))))
+
+(defun esh-autosuggest--companyless-complete ()
+  "Insert the auto suggestion."
+  (interactive)
+  (when (and eshell-mode
+             esh-autosuggest--companyless-overlay)
+    (insert (substring-no-properties
+             (or (overlay-get esh-autosuggest--companyless-overlay 'after-string)
+                 "")))))
+
+(define-minor-mode esh-autosuggest-companyless-mode
+  "`esh-autosuggest-mode' but don't use company as front end."
+  :keymap (make-sparse-keymap)
+  :group 'esh-autosuggest
+  (when esh-autosuggest-mode
+    (esh-autosuggest-mode -1))
+  (if esh-autosuggest-companyless-mode
+      (add-hook 'post-command-hook #'esh-autosuggest--companyless-post-command-hook t t)
+    (remove-hook 'post-command-hook #'esh-autosuggest--companyless-post-command-hook t)
+    ;; clean up overlay
+    (when esh-autosuggest--companyless-overlay
+      (delete-overlay esh-autosuggest--companyless-overlay)
+      (define-key esh-autosuggest-companyless-mode-map
+        (kbd "C-f") nil))))
+
 (define-minor-mode esh-autosuggest-mode
   "Enable fish-like autosuggestions in eshell.
 
