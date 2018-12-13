@@ -216,6 +216,7 @@ respectively."
              (or (overlay-get esh-autosuggest--companyless-overlay 'after-string)
                  "")))))
 
+;;;###autoload
 (define-minor-mode esh-autosuggest-companyless-mode
   "`esh-autosuggest-mode' but don't use company as front end."
   :keymap (make-sparse-keymap)
@@ -231,6 +232,7 @@ respectively."
       (define-key esh-autosuggest-companyless-mode-map
         (kbd "C-f") nil))))
 
+;;;###autoload
 (define-minor-mode esh-autosuggest-mode
   "Enable fish-like autosuggestions in eshell.
 
