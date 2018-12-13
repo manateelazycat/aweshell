@@ -217,16 +217,20 @@ history autosuggestions."
                                                     map)
   "The map used on overlay so you can complete with C-f.")
 
+(defun esh-autosuggest--companyless-cleanup ()
+  "Remove overlay and keybinding."
+  (when esh-autosuggest--companyless-overlay
+    (delete-overlay esh-autosuggest--companyless-overlay)
+    (setq esh-autosuggest--companyless-overlay nil))
+  (define-key esh-autosuggest-companyless-mode-map
+    (kbd "C-f") nil))
+
 (defun esh-autosuggest--companyless-post-command-hook ()
   "Add autosuggest to overlay."
   (when (and eshell-mode
              (not (minibufferp)))
     ;; remove overlay and later (if needed) create a new one
-    (when esh-autosuggest--companyless-overlay
-      (delete-overlay esh-autosuggest--companyless-overlay)
-      (setq esh-autosuggest--companyless-overlay nil))
-    (define-key esh-autosuggest-companyless-mode-map
-      (kbd "C-f") nil)
+    (esh-autosuggest--companyless-cleanup)
     (let ((prefix (if (or (eq (char-after) nil) ; only complete when at end of symbol
                           (eq (char-after) ?\n))
                       (esh-autosuggest--prefix)
@@ -246,6 +250,17 @@ history autosuggestions."
                      ;; the overlay
                      'cursor 0 'face 'esh-autosuggest-companyless))))))
 
+(defun esh-autosuggest-companyless-mode-off-hook (&rest _)
+  "Turn off, used in company hooks."
+  (esh-autosuggest-companyless-mode -1)
+  (add-hook 'company-completion-started-hook #'esh-autosuggest-companyless-mode-off-hook t t)
+  (add-hook 'company-completion-cancelled-hook #'esh-autosuggest-companyless-mode-on-hook t t)
+  (add-hook 'company-completion-finished-hook #'esh-autosuggest-companyless-mode-on-hook t t))
+
+(defun esh-autosuggest-companyless-mode-on-hook (&rest _)
+  "Turn on, used in company hooks."
+  (esh-autosuggest-companyless-mode))
+
 (defun esh-autosuggest--companyless-complete ()
   "Insert the auto suggestion."
   (interactive)
@@ -263,13 +278,16 @@ history autosuggestions."
   (when esh-autosuggest-mode
     (esh-autosuggest-mode -1))
   (if esh-autosuggest-companyless-mode
-      (add-hook 'post-command-hook #'esh-autosuggest--companyless-post-command-hook t t)
+      (progn (add-hook 'post-command-hook #'esh-autosuggest--companyless-post-command-hook t t)
+             (add-hook 'company-completion-started-hook #'esh-autosuggest-companyless-mode-off-hook t t)
+             (add-hook 'company-completion-cancelled-hook #'esh-autosuggest-companyless-mode-on-hook t t)
+             (add-hook 'company-completion-finished-hook #'esh-autosuggest-companyless-mode-on-hook t t))
     (remove-hook 'post-command-hook #'esh-autosuggest--companyless-post-command-hook t)
-    ;; clean up overlay
-    (when esh-autosuggest--companyless-overlay
-      (delete-overlay esh-autosuggest--companyless-overlay)
-      (define-key esh-autosuggest-companyless-mode-map
-        (kbd "C-f") nil))))
+    (remove-hook 'company-completion-started-hook #'esh-autosuggest-companyless-mode-off-hook t)
+    (remove-hook 'company-completion-cancelled-hook #'esh-autosuggest-companyless-mode-on-hook t)
+    (remove-hook 'company-completion-finished-hook #'esh-autosuggest-companyless-mode-on-hook t)
+    ;; clean up overlay and binding
+    (esh-autosuggest--companyless-cleanup)))
 
 (provide 'esh-autosuggest)
 
