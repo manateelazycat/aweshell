@@ -164,6 +164,45 @@ respectively."
                  (esh-autosuggest--prefix)))
     (candidates (esh-autosuggest-candidates arg))))
 
+;;;###autoload
+(define-minor-mode esh-autosuggest-mode
+  "Enable fish-like autosuggestions in eshell.
+
+You can use <right> to select the suggestion. This is
+customizable through `esh-autosuggest-active-map'. If
+you prefer to use the default value of `company-active-map', you
+may set the variable
+`esh-autosuggest-use-company-map', though this isn't
+recommended as RET and TAB may not work as expected (send input,
+trigger completions, respectively) when there is an active
+suggestion.
+
+The delay defaults to 0 seconds to emulate fish shell's
+instantaneous suggestions, but is customizable with
+`esh-autosuggest-delay'.
+
+Note: This assumes you want to use something other than company
+for shell completion, e.g. `eshell-pcomplete',
+`completion-at-point', or helm-esh-pcomplete, since
+`company-active-map', `company-backends', and `company-frontends'
+will be locally overriden and company will be used solely for
+history autosuggestions."
+  :init-value nil
+  :group 'esh-autosuggest
+  (if esh-autosuggest-mode
+      (progn
+        (company-mode 1)
+        (unless esh-autosuggest-use-company-map
+          (setq-local company-active-map esh-autosuggest-active-map))
+        (setq-local company-idle-delay esh-autosuggest-delay)
+        (setq-local company-backends '(esh-autosuggest))
+        (setq-local company-frontends '(company-preview-frontend)))
+    (company-mode -1)
+    (kill-local-variable 'company-active-map)
+    (kill-local-variable 'company-idle-delay)
+    (kill-local-variable 'company-backends)
+    (kill-local-variable 'company-frontends)))
+
 ;;;; Companyless
 
 (defvar esh-autosuggest--companyless-overlay nil
@@ -231,45 +270,6 @@ respectively."
       (delete-overlay esh-autosuggest--companyless-overlay)
       (define-key esh-autosuggest-companyless-mode-map
         (kbd "C-f") nil))))
-
-;;;###autoload
-(define-minor-mode esh-autosuggest-mode
-  "Enable fish-like autosuggestions in eshell.
-
-You can use <right> to select the suggestion. This is
-customizable through `esh-autosuggest-active-map'. If
-you prefer to use the default value of `company-active-map', you
-may set the variable
-`esh-autosuggest-use-company-map', though this isn't
-recommended as RET and TAB may not work as expected (send input,
-trigger completions, respectively) when there is an active
-suggestion.
-
-The delay defaults to 0 seconds to emulate fish shell's
-instantaneous suggestions, but is customizable with
-`esh-autosuggest-delay'.
-
-Note: This assumes you want to use something other than company
-for shell completion, e.g. `eshell-pcomplete',
-`completion-at-point', or helm-esh-pcomplete, since
-`company-active-map', `company-backends', and `company-frontends'
-will be locally overriden and company will be used solely for
-history autosuggestions."
-  :init-value nil
-  :group 'esh-autosuggest
-  (if esh-autosuggest-mode
-      (progn
-        (company-mode 1)
-        (unless esh-autosuggest-use-company-map
-          (setq-local company-active-map esh-autosuggest-active-map))
-        (setq-local company-idle-delay esh-autosuggest-delay)
-        (setq-local company-backends '(esh-autosuggest))
-        (setq-local company-frontends '(company-preview-frontend)))
-    (company-mode -1)
-    (kill-local-variable 'company-active-map)
-    (kill-local-variable 'company-idle-delay)
-    (kill-local-variable 'company-backends)
-    (kill-local-variable 'company-frontends)))
 
 (provide 'esh-autosuggest)
 
