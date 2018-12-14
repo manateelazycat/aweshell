@@ -212,18 +212,11 @@ history autosuggestions."
                                        (((background light)) . (:foreground "silver")))
   "Face of auto suggestion when using companyless mode.")
 
-(defvar esh-autosuggest--companyless-override-map (let ((map (make-sparse-keymap)))
-                                                    (define-key map (kbd "C-f") #'esh-autosuggest--companyless-complete)
-                                                    map)
-  "The map used on overlay so you can complete with C-f.")
-
 (defun esh-autosuggest--companyless-cleanup ()
   "Remove overlay and keybinding."
   (when esh-autosuggest--companyless-overlay
     (delete-overlay esh-autosuggest--companyless-overlay)
-    (setq esh-autosuggest--companyless-overlay nil))
-  (define-key esh-autosuggest-companyless-mode-map
-    (kbd "C-f") nil))
+    (setq esh-autosuggest--companyless-overlay nil)))
 
 (defun esh-autosuggest--companyless-post-command-hook ()
   "Add autosuggest to overlay."
@@ -240,11 +233,9 @@ history autosuggestions."
                  (setq suggest (car (esh-autosuggest-candidates prefix))))
         (setq esh-autosuggest--companyless-overlay
               (make-overlay (point) (point)))
-        (define-key esh-autosuggest-companyless-mode-map
-          (kbd "C-f") #'esh-autosuggest--companyless-complete)
         (overlay-put
          esh-autosuggest--companyless-overlay
-         'after-string ; use after sting to display suggestion
+         'after-string         ; use after sting to display suggestion
          (propertize (substring suggest (length prefix)) ; remove prefix from suggestion
                      ;; without 'cursor property, the cursor is displayed at the end of
                      ;; the overlay
