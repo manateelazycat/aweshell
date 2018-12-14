@@ -6,8 +6,8 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-08-13 23:18:35
-;; Version: 2.6
-;; Last-Updated: 2018-11-12 18:40:59
+;; Version: 2.7
+;; Last-Updated: 2018-12-14 20:11:00
 ;;           By: Andy Stewart
 ;; URL: http://www.emacswiki.org/emacs/download/aweshell.el
 ;; Keywords:
@@ -97,8 +97,11 @@
 ;;; Change log:
 ;;;
 ;;
+;; 2018/12/14
+;;      * Add new option `aweshell-autosuggest-backend' to swtich between fish-style and company-style.
+;;
 ;; 2018/11/12
-;;  * Remove Mac color, use hex color instead.
+;;      * Remove Mac color, use hex color instead.
 ;;
 ;; 2018/10/19
 ;;      * Alert user when background process finished or aborted.
