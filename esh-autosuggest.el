@@ -139,20 +139,25 @@ respectively."
 
 (defun esh-autosuggest--prefix ()
   "Get current eshell input."
-  (let* ((input-start (progn
-                        (save-excursion
-                          (beginning-of-line)
-                          (while (not (looking-at-p eshell-prompt-regexp))
-                            (forward-line -1))
-                          (eshell-bol))))
-         (prefix
-          (string-trim-left
-           (buffer-substring-no-properties
-            input-start
-            (line-end-position)))))
-    (if (not (string-empty-p prefix))
-        prefix
-      'stop)))
+  (catch 'no-prompt
+    (let* ((point-min (point-min))
+           (input-start
+            (save-excursion
+              (beginning-of-line)
+              (while (and (not (looking-at-p eshell-prompt-regexp))
+                          (not (eq point-min (point))))
+                (forward-line -1))
+              (when (eq point-min (point))
+                (throw 'no-prompt 'stop))
+              (eshell-bol)))
+           (prefix
+            (string-trim-left
+             (buffer-substring-no-properties
+              input-start
+              (line-end-position)))))
+      (if (not (string-empty-p prefix))
+          prefix
+        'stop))))
 
 ;;;###autoload
 (defun esh-autosuggest (command &optional arg &rest ignored)
