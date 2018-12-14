@@ -34,47 +34,69 @@ It's set in your ~/.emacs like this:
 
 Bind your favorite key to functions:
 
-```Elisp
-aweshell-new
-aweshell-next
-aweshell-prev
-aweshell-clear-buffer
-aweshell-sudo-toggle
-```
+# Usage
+
+| Commands                    | Description                                                   |
+|-----------------------------|---------------------------------------------------------------|
+| ```aweshell-new```          | create a new eshell buffer                                    |
+| ```aweshell-next```         | switch to next aweshell buffer                                |
+| ```aweshell-prev```         | switch to previous aweshell buffer                            |
+| ```aweshell-clear-buffer``` | clear eshell buffer                                           |
+| ```aweshell-sudo-toggle```  | toggle sudo                                                   |
+| ```aweshell-toggle```       | switch back and forth between eshell buffer and normal buffer |
+
 
 # Customize
 
-Customize variables below by:
+## Variables
+
+Customize variables  by:
 ```Elisp
 M-x customize-group RET aweshell RET
 ```
 
+| Variable                                | Description                                                            |
+|-----------------------------------------|------------------------------------------------------------------------|
+| ```aweshell-complete-selection-key```   | Key used for complete selected candidate                               |
+| ```aweshell-clear-buffer-key```         | Key used to clear buffer (like <kbd>C-l</kbd> in traditional terminal) |
+| ```aweshell-sudo-toggle-key```          | Key used to toggle sudo                                                |
+| ```aweshell-use-exec-path-from-shell``` | Whether to use exec-path-from-shell to setup environment               |
+| ```aweshell-autosuggest-frontend```     | Front end for displaying autosuggest                                   |
+
+## Customize shell prompt
+
+Aweshell uses eshell-prompt-extra to prettify shell prompt.
+Consult [eshell-prompt-extra's README](https://github.com/kaihaosw/eshell-prompt-extras#themes) on how to customize shell prompt.
+
+## Customize eshell-up
+
 ```Elisp
-aweshell-complete-selection-key
-aweshell-clear-buffer-key
-aweshell-sudo-toggle-key
-aweshell-use-exec-path-from-shell
-aweshell-autosuggest-frontend
+(setq eshell-up-ignore-case nil)
+(setq eshell-up-print-parent-dir t)
 ```
 
-Customize prompt as directed in [eshell-prompt-extras' README](https://github.com/kaihaosw/eshell-prompt-extras#themes).
+Checkout [homepage of eshell-up](https://github.com/peterwvj/eshell-up) for more information.
 
-By default, company is used for fish-like auto suggestion, if you want to use company for completion, switch ```aweshell-autosuggest-frontend``` from ```'company``` to ```'custom```.
+
+## More on autosuggest front end
+
+By default, company is used for fish-like auto suggestion,
+if you want to use company for completion,
+change ```aweshell-autosuggest-frontend``` from ```'company``` to ```'custom```.
 
 <img src="./company-style-completion.png">
 
 ## Aliases
 
-[eshell-up](https://github.com/peterwvj/eshell-up)
+Suggested alias for [eshell-up](https://github.com/peterwvj/eshell-up) and other eshell commands:
 
-In alias file:
+Put in alias file:
 ```
 alias up eshell-up $1
 alias pk eshell-up-peek $1
-```
-
-Other customization of eshell-up:
-```Elisp
-(setq eshell-up-ignore-case nil)
-(setq eshell-up-print-parent-dir t)
+alias ff find-file $1
+alias ll ls -al
+alias dd dired $1
+alias fo find-file-other-window $1
+alias gs magit-status
 ```
