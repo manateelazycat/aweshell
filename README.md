@@ -58,7 +58,10 @@ aweshell-use-exec-path-from-shell
 
 Customize prompt as directed in [eshell-prompt-extras' README](https://github.com/kaihaosw/eshell-prompt-extras#themes).
 
-Default completion backend use ```fish-style```, you can switch to ```company-style``` to enable completion style similar to IDE.
+Default completion backend ```aweshell-autosuggest-backend``` use ```fish-style```, you can switch to ```company-style``` to enable completion style similar to IDE like below:
+```
+(setq aweshell-autosuggest-backend "company-style")
+```
 
 <img src="./company-style-completion.png">
 
