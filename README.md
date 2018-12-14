@@ -20,7 +20,7 @@ So I wrote `aweshell.el` to extend `eshell` with these features:
 12. Output "did you mean ..." helper when you typo.
 13. Make cat file with syntax highlight.
 14. Alert user when background process finished or aborted.
-15. Provide IDE completion feeling for shell command.
+15. IDE-like completion for shell commands.
 
 # Installation
 
@@ -54,14 +54,12 @@ aweshell-complete-selection-key
 aweshell-clear-buffer-key
 aweshell-sudo-toggle-key
 aweshell-use-exec-path-from-shell
+aweshell-autosuggest-frontend
 ```
 
 Customize prompt as directed in [eshell-prompt-extras' README](https://github.com/kaihaosw/eshell-prompt-extras#themes).
 
-Default completion backend ```aweshell-autosuggest-backend``` use ```fish-style```, you can switch to ```company-style``` to enable completion style similar to IDE like below:
-```
-(setq aweshell-autosuggest-backend "company-style")
-```
+By default, company is used for fish-like auto suggestion, if you want to use company for completion, switch ```aweshell-autosuggest-frontend``` from ```'company``` to ```'custom```.
 
 <img src="./company-style-completion.png">
 

@@ -57,7 +57,7 @@
 ;; 12. Output "did you mean ..." helper when you typo.
 ;; 13. Make cat file with syntax highlight.
 ;; 14. Alert user when background process finished or aborted.
-;;
+;; 15. IDE-like completion for shell commands.
 
 ;;; Installation:
 ;;
@@ -89,6 +89,7 @@
 ;; `aweshell-valid-command-color'
 ;; `aweshell-invalid-command-color'
 ;; `aweshell-use-exec-path-from-shell'
+;; `aweshell-autosuggest-frontend'
 ;;
 ;; All of the above can customize by:
 ;;      M-x customize-group RET aweshell RET
@@ -96,6 +97,8 @@
 
 ;;; Change log:
 ;;;
+;; 2018/12/14
+;;      * Change option `aweshell-autosuggest-backend' to `aweshell-autosuggest-frontend' for clarity.
 ;;
 ;; 2018/12/14
 ;;      * Add new option `aweshell-autosuggest-backend' to swtich between fish-style and company-style.
@@ -212,10 +215,11 @@
   :type 'string
   :group 'aweshell)
 
-(defcustom aweshell-autosuggest-backend "fish-style"
-  "Command completion backend, default is in fish style.
-You can also use the `company-style' for menu completion."
-  :type 'string
+(defcustom aweshell-autosuggest-frontend 'company
+  "Front end to show fish-like auto suggestions (based on history)
+By default it is 'company, that prevents you from using company-mode for completion.
+If that bothers you, use 'custom as the front end."
+  :type 'symbol
   :group 'aweshell)
 
 (defface aweshell-alert-buffer-face
@@ -411,12 +415,12 @@ Create new one if no eshell buffer exists."
 ;; esh-autosuggest
 ;; Fish-like history autosuggestions in eshell
 (require 'esh-autosuggest)
-(cond ((string-equal aweshell-autosuggest-backend "fish-style")
+(cond ((eq aweshell-autosuggest-frontend 'company)
        (add-hook 'eshell-mode-hook
                  (lambda ()
                    (esh-autosuggest-mode)
                    (define-key eshell-mode-map (kbd aweshell-complete-selection-key) 'company-complete-selection))))
-      ((string-equal aweshell-autosuggest-backend "company-style")
+      ((string-equal aweshell-autosuggest-frontend 'custom)
        (add-hook 'eshell-mode-hook
                  (lambda ()
                    (esh-autosuggest-companyless-mode)
