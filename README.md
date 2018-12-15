@@ -26,7 +26,7 @@ So I wrote `aweshell.el` to extend `eshell` with these features:
 
 # Installation
 
-Put `aweshell.el`, `esh-autosuggest.el`, `eshell-prompt-extras.el`, `exec-path-from-shell.el` to your load-path.
+Put `aweshell.el`, `eshell-prompt-extras.el`, `exec-path-from-shell.el` to your load-path.
 The load-path is usually ~/elisp/.
 It's set in your ~/.emacs like this:
 ```Elisp
