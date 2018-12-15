@@ -86,6 +86,14 @@ change ```aweshell-autosuggest-frontend``` from ```'company``` to ```'custom```.
 
 <img src="./company-style-completion.png">
 
+I advie to disable company's auto completion in shell, because it could become annoying. Sugguested config:
+```Elisp
+(add-hook
+   'eshell-mode-hook
+   (lambda ()
+     (setq-local company-idle-delay 9999)))
+```
+
 ## Aliases
 
 Suggested alias for [eshell-up](https://github.com/peterwvj/eshell-up) and other eshell commands:
