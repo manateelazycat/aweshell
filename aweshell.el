@@ -6,8 +6,8 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-08-13 23:18:35
-;; Version: 2.8
-;; Last-Updated: 2018-12-15 12:14:12
+;; Version: 2.9
+;; Last-Updated: 2018-12-15 17:23:27
 ;;           By: Andy Stewart
 ;; URL: http://www.emacswiki.org/emacs/download/aweshell.el
 ;; Keywords:
@@ -100,6 +100,7 @@
 ;;
 ;; 2018/12/15
 ;;      * Mix best match history and shell completions in company's completion menu.
+;;      * Fix error when completion.
 ;;
 ;; 2018/12/14
 ;;      * Add new option `aweshell-autosuggest-backend' to swtich between fish-style and company-style.
@@ -664,7 +665,10 @@ Create new one if no eshell buffer exists."
                         (aweshell-parse-shell-history)))
          (command-prefix-args (mapconcat 'identity (nbutlast (split-string prefix)) " "))
          (command-last-arg (car (last (split-string prefix))))
-         (shell-completions (remove-if-not (lambda (c) (string-prefix-p command-last-arg c)) (pcomplete-completions)))
+         (completions (pcomplete-completions))
+         (shell-completions (if (typep completions 'cons)
+                                (remove-if-not (lambda (c) (string-prefix-p command-last-arg c)) completions)
+                              nil))
          (suggest-completions (mapcar (lambda (c) (string-trim (concat command-prefix-args " " c))) shell-completions)))
     (if most-similar
         (append (list most-similar) suggest-completions)
