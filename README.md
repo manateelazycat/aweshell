@@ -1,3 +1,5 @@
+<img src="./aweshell.gif">
+
 # What is aweshell?
 
 I created `multi-term.el` and use it many years.
@@ -9,7 +11,7 @@ So I wrote `aweshell.el` to extend `eshell` with these features:
 1. Create and manage multiple eshell buffers.
 2. Add some useful commands, such as: clear buffer, toggle sudo etc.
 3. Display extra information and color like zsh, powered by `eshell-prompt-extras'
-4. Add Fish-like history autosuggestions, powered by `esh-autosuggest', support histories from bash/zsh/eshell.
+4. Add Fish-like history autosuggestions.
 5. Validate and highlight command before post to eshell.
 6. Change buffer name by directory change.
 7. Add completions for git command.
@@ -20,7 +22,7 @@ So I wrote `aweshell.el` to extend `eshell` with these features:
 12. Output "did you mean ..." helper when you typo.
 13. Make cat file with syntax highlight.
 14. Alert user when background process finished or aborted.
-15. Provide IDE completion feeling for shell command.
+15. Complete shell command arguments like IDE feeling.
 
 # Installation
 
@@ -57,13 +59,6 @@ aweshell-use-exec-path-from-shell
 ```
 
 Customize prompt as directed in [eshell-prompt-extras' README](https://github.com/kaihaosw/eshell-prompt-extras#themes).
-
-Default completion backend ```aweshell-autosuggest-backend``` use ```fish-style```, you can switch to ```company-style``` to enable completion style similar to IDE like below:
-```
-(setq aweshell-autosuggest-backend "company-style")
-```
-
-<img src="./company-style-completion.png">
 
 ## Aliases
 
