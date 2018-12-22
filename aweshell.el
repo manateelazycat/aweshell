@@ -6,8 +6,8 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-08-13 23:18:35
-;; Version: 2.9
-;; Last-Updated: 2018-12-15 17:23:27
+;; Version: 3.0
+;; Last-Updated: 2018-12-22 15:25:37
 ;;           By: Andy Stewart
 ;; URL: http://www.emacswiki.org/emacs/download/aweshell.el
 ;; Keywords:
@@ -97,6 +97,9 @@
 
 ;;; Change log:
 ;;;
+;;
+;; 2018/12/22
+;;      * Mix best history and complete arguments just when history not exist in completion arguments.
 ;;
 ;; 2018/12/15
 ;;      * Mix best match history and shell completions in company's completion menu.
@@ -670,7 +673,9 @@ Create new one if no eshell buffer exists."
                                 (remove-if-not (lambda (c) (string-prefix-p command-last-arg c)) completions)
                               nil))
          (suggest-completions (mapcar (lambda (c) (string-trim (concat command-prefix-args " " c))) shell-completions)))
-    (if most-similar
+    ;; Mix best history and complete arguments just when history not exist in completion arguments.
+    (if (and most-similar
+             (not (member most-similar suggest-completions)))
         (append (list most-similar) suggest-completions)
       suggest-completions)
     ))
