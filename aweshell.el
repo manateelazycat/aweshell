@@ -6,8 +6,8 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-08-13 23:18:35
-;; Version: 3.0
-;; Last-Updated: 2018-12-22 15:25:37
+;; Version: 3.1
+;; Last-Updated: 2018-12-27 09:02:44
 ;;           By: Andy Stewart
 ;; URL: http://www.emacswiki.org/emacs/download/aweshell.el
 ;; Keywords:
@@ -97,6 +97,9 @@
 
 ;;; Change log:
 ;;;
+;;
+;; 2018/12/27
+;;      * Fix backtrace when type command: git clone "
 ;;
 ;; 2018/12/22
 ;;      * Mix best history and complete arguments just when history not exist in completion arguments.
@@ -668,7 +671,7 @@ Create new one if no eshell buffer exists."
                         (aweshell-parse-shell-history)))
          (command-prefix-args (mapconcat 'identity (nbutlast (split-string prefix)) " "))
          (command-last-arg (car (last (split-string prefix))))
-         (completions (pcomplete-completions))
+         (completions (ignore-errors (pcomplete-completions)))
          (shell-completions (if (typep completions 'cons)
                                 (remove-if-not (lambda (c) (string-prefix-p command-last-arg c)) completions)
                               nil))
