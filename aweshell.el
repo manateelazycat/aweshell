@@ -6,8 +6,8 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-08-13 23:18:35
-;; Version: 3.1
-;; Last-Updated: 2018-12-27 09:02:44
+;; Version: 3.2
+;; Last-Updated: 2018-12-28 23:49:04
 ;;           By: Andy Stewart
 ;; URL: http://www.emacswiki.org/emacs/download/aweshell.el
 ;; Keywords:
@@ -97,6 +97,10 @@
 
 ;;; Change log:
 ;;;
+;;
+;; 2018/12/28
+;;      * When the command includes " or [ , the `pcomplete-completions' command will report an error,
+;;        So company menu will be disabled when these characters are included.
 ;;
 ;; 2018/12/27
 ;;      * Fix backtrace when type command: git clone "
@@ -665,23 +669,28 @@ Create new one if no eshell buffer exists."
 
 (defun aweshell-autosuggest-candidates (prefix)
   "Select the first eshell history candidate and shell completions that starts with PREFIX."
-  (let* ((most-similar (cl-find-if
-                        (lambda (str)
-                          (string-prefix-p prefix str))
-                        (aweshell-parse-shell-history)))
-         (command-prefix-args (mapconcat 'identity (nbutlast (split-string prefix)) " "))
-         (command-last-arg (car (last (split-string prefix))))
-         (completions (ignore-errors (pcomplete-completions)))
-         (shell-completions (if (typep completions 'cons)
-                                (remove-if-not (lambda (c) (string-prefix-p command-last-arg c)) completions)
-                              nil))
-         (suggest-completions (mapcar (lambda (c) (string-trim (concat command-prefix-args " " c))) shell-completions)))
-    ;; Mix best history and complete arguments just when history not exist in completion arguments.
-    (if (and most-similar
-             (not (member most-similar suggest-completions)))
-        (append (list most-similar) suggest-completions)
-      suggest-completions)
-    ))
+  (unless (or
+           ;; When the command includes " or [ , the `pcomplete-completions' command will report an error,
+           ;; So company menu will be disabled when these characters are included.
+           (cl-search "\"" prefix)
+           (cl-search "[" prefix))
+    (let* ((most-similar (cl-find-if
+                          (lambda (str)
+                            (string-prefix-p prefix str))
+                          (aweshell-parse-shell-history)))
+           (command-prefix-args (mapconcat 'identity (nbutlast (split-string prefix)) " "))
+           (command-last-arg (car (last (split-string prefix))))
+           (completions (ignore-errors (pcomplete-completions)))
+           (shell-completions (if (typep completions 'cons)
+                                  (remove-if-not (lambda (c) (string-prefix-p command-last-arg c)) completions)
+                                nil))
+           (suggest-completions (mapcar (lambda (c) (string-trim (concat command-prefix-args " " c))) shell-completions)))
+      ;; Mix best history and complete arguments just when history not exist in completion arguments.
+      (if (and most-similar
+               (not (member most-similar suggest-completions)))
+          (append (list most-similar) suggest-completions)
+        suggest-completions)
+      )))
 
 (defun aweshell-autosuggest (command &optional arg &rest ignored)
   "`company-mode' backend to provide eshell history suggestion."
