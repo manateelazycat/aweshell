@@ -76,7 +76,9 @@ If THRESHOLD is non-nil, use is as the maximum edit distance."
 (defun eshell-did-you-mean--get-all-commands ()
   "Feed `eshell-did-you-mean--all-commands'."
   (unless eshell-did-you-mean--all-commands
-    (setq eshell-did-you-mean--all-commands (pcomplete-completions))))
+    (setq eshell-did-you-mean--all-commands
+          (ignore-errors
+            (pcomplete-completions)))))
 
 (defun eshell-did-you-mean-output-filter (output)
   "\"Did you mean\" filter for eshell OUTPUT.
