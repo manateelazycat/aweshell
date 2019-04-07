@@ -567,10 +567,8 @@ Create new one if no eshell buffer exists."
             (run-with-idle-timer
              1 nil
              #'(lambda ()
-                 (message "Loading eshell-did-you-mean plugin...")
                  (require 'eshell-did-you-mean)
                  (eshell-did-you-mean-setup)
-                 (message "Loading eshell-did-you-mean plugin finished.")
                  ))))
 
 ;; Make cat with syntax highlight.
