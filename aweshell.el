@@ -98,7 +98,7 @@
 ;;; Change log:
 ;;;
 ;; 2019/04/07
-;;      * Increased startup speed, loaded `eshell-did-you-mean' plugin when idle 
+;;      * Increased startup speed, loaded `eshell-did-you-mean' plugin when idle
 ;;
 ;; 2019/1/2
 ;;      * When the command includes * or \ , the `pcomplete-completions' command will report an error,
@@ -562,12 +562,16 @@ Create new one if no eshell buffer exists."
 
 ;; eshell-did-you-mean
 ;; command not found (“did you mean…” feature) in Eshell.
-(run-with-idle-timer
- 1 nil
- #'(lambda ()
-     (require 'eshell-did-you-mean)
-     (eshell-did-you-mean-setup)
-     ))
+(add-hook 'eshell-mode-hook
+          (lambda ()
+            (run-with-idle-timer
+             1 nil
+             #'(lambda ()
+                 (message "Loading eshell-did-you-mean plugin...")
+                 (require 'eshell-did-you-mean)
+                 (eshell-did-you-mean-setup)
+                 (message "Loading eshell-did-you-mean plugin finished.")
+                 ))))
 
 ;; Make cat with syntax highlight.
 (defun aweshell-cat-with-syntax-highlight (filename)
