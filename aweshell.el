@@ -392,7 +392,7 @@ Create new one if no eshell buffer exists."
   (save-excursion
     (let* ((start-pos (eshell-beginning-of-input))
            (input (eshell-get-old-input))
-           (all-shell-history (esh-parse-shell-history)))
+           (all-shell-history (aweshell-parse-shell-history)))
       (let* ((command (ido-completing-read "Search history: " all-shell-history)))
         (eshell-kill-input)
         (insert command)
