@@ -42,6 +42,7 @@ aweshell-next
 aweshell-prev
 aweshell-clear-buffer
 aweshell-sudo-toggle
+aweshell-switch-buffer
 ```
 
 # Customize

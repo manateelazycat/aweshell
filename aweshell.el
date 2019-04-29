@@ -78,6 +78,7 @@
 ;; `aweshell-prev'
 ;; `aweshell-clear-buffer'
 ;; `aweshell-sudo-toggle'
+;; `aweshell-switch-buffer'
 ;;
 
 ;;; Customize:
@@ -97,6 +98,9 @@
 
 ;;; Change log:
 ;;;
+;; 2019/04/29
+;;      * Add interactive command `aweshell-switch-buffer'.
+;;
 ;; 2019/04/07
 ;;      * Increased startup speed, loaded `eshell-did-you-mean' plugin when idle
 ;;
@@ -399,6 +403,38 @@ Create new one if no eshell buffer exists."
         )))
   ;; move cursor to eol
   (end-of-line))
+
+(defun aweshell-switch-buffer ()
+  "Switch to another aweshell buffer."
+  (interactive)
+  (cond ((= 0 (length aweshell-buffer-list))
+	 (aweshell-new)
+	 (message "No Aweshell buffer yet, create a new one."))
+	((= 1 (length aweshell-buffer-list)) ; only one Aweshell buffer, just switch to it
+	 (switch-to-buffer (nth 0 aweshell-buffer-list)))
+	(t
+	 (let* ((completion-extra-properties '(:annotation-function aweshell-switch-buffer--annotate))
+		(buffer-alist (mapcar (lambda (buffer) `(,(buffer-name buffer) . ,buffer)) aweshell-buffer-list))
+		(pwd default-directory)
+		(preselect))
+	   ;; find most suitable preselect buffer
+	   (dolist (buffer aweshell-buffer-list)
+	     (with-current-buffer buffer
+	       (when (and
+		      (or (not preselect) (< (length preselect) (length default-directory)))
+		      (file-in-directory-p pwd default-directory))
+		 (setq preselect (propertize default-directory :buffer-name (buffer-name buffer))))))
+	   (let ((result-buffer (completing-read "Switch to Aweshell buffer: " buffer-alist nil t nil nil
+						 (get-text-property 0 :buffer-name (or preselect "")))))
+	     (switch-to-buffer (alist-get result-buffer buffer-alist nil nil #'equal)))))))
+
+(defun aweshell-switch-buffer--annotate (candidate)
+  (let* ((buffer-alist
+	  (mapcar (lambda (buffer) `(,(buffer-name buffer) . ,buffer)) aweshell-buffer-list))
+	 (candidate-buffer (alist-get candidate buffer-alist nil nil #'equal)))
+    (with-current-buffer candidate-buffer
+      ;; display the last command of aweshell buffer
+      (format "  <%s>" (eshell-get-history 0)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Aweshell keymap ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (add-hook 'eshell-mode-hook
