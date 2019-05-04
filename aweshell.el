@@ -434,7 +434,7 @@ Create new one if no eshell buffer exists."
 	 (candidate-buffer (alist-get candidate buffer-alist nil nil #'equal)))
     (with-current-buffer candidate-buffer
       ;; display the last command of aweshell buffer
-      (format "  <%s>" (eshell-get-history 0)))))
+      (format "  <%s> %s" (eshell-get-history 0) (if eshell-current-command "(Running)" "")))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Aweshell keymap ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (add-hook 'eshell-mode-hook
