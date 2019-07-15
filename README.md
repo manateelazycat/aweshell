@@ -61,9 +61,15 @@ aweshell-complete-selection-key
 aweshell-clear-buffer-key
 aweshell-sudo-toggle-key
 aweshell-use-exec-path-from-shell
+aweshell-dedicated-window-height
 ```
 
 Customize prompt as directed in [eshell-prompt-extras' README](https://github.com/kaihaosw/eshell-prompt-extras#themes).
+
+## Dedicated window
+You can use command ```aweshell-dedicated-toggle``` to pop dedicated window at bottom of frame.
+
+<img src="./aweshell-dedicated.gif">
 
 ## Aliases
 
