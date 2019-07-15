@@ -6,8 +6,8 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-08-13 23:18:35
-;; Version: 4.0
-;; Last-Updated: 2019-07-16 00:19:24
+;; Version: 4.1
+;; Last-Updated: 2019-07-16 00:46:48
 ;;           By: Andy Stewart
 ;; URL: http://www.emacswiki.org/emacs/download/aweshell.el
 ;; Keywords:
@@ -105,6 +105,7 @@
 ;;
 ;; 2019/07/16
 ;;      * Add `aweshell-dedicated-toggle' command.
+;;      * Refactory code.
 ;;
 ;; 2019/04/29
 ;;      * Add interactive command `aweshell-switch-buffer'.
@@ -482,27 +483,13 @@ Otherwise return nil."
   (and buffer (buffer-live-p buffer)))
 
 (defun aweshell-dedicated-open ()
+  "Open dedicated `aweshell' window."
   (interactive)
   (if (aweshell-buffer-exist-p aweshell-dedicated-buffer)
       (if (aweshell-window-exist-p aweshell-dedicated-window)
-          (progn
-            (select-window aweshell-dedicated-window)
-            (set-window-dedicated-p (selected-window) t))
-        (progn
-          (split-window (selected-window) (- (aweshell-current-window-take-height) aweshell-dedicated-window-height))
-          (other-window 1)
-          (setq aweshell-dedicated-window (selected-window))
-          (set-window-buffer aweshell-dedicated-window (get-buffer aweshell-dedicated-buffer-name))
-          (set-window-dedicated-p (selected-window) t)))
-    (aweshell-dedicated-create)
-    ))
-
-(defun aweshell-dedicated-select ()
-  "Select the `aweshell' dedicated window."
-  (interactive)
-  (if (aweshell-dedicated-exist-p)
-      (select-window aweshell-dedicated-window)
-    (message "`aweshell' window is not exist.")))
+          (aweshell-dedicated-select-window)
+        (aweshell-dedicated-pop-window))
+    (aweshell-dedicated-create-window)))
 
 (defun aweshell-dedicated-close ()
   "Close dedicated `aweshell' window."
@@ -510,7 +497,7 @@ Otherwise return nil."
   (if (aweshell-dedicated-exist-p)
       (let ((current-window (selected-window)))
         ;; Remember height.
-        (aweshell-dedicated-select)
+        (aweshell-dedicated-select-window)
         (delete-window aweshell-dedicated-window)
         (if (aweshell-window-exist-p current-window)
             (select-window current-window)))
@@ -521,18 +508,39 @@ Otherwise return nil."
   (interactive)
   (if (aweshell-dedicated-exist-p)
       (aweshell-dedicated-close)
-    (aweshell-dedicated-open)
-    ))
+    (aweshell-dedicated-open)))
 
-(defun aweshell-dedicated-create ()
-  (split-window (selected-window) (- (aweshell-current-window-take-height) aweshell-dedicated-window-height))
-  (other-window 1)
+(defun aweshell-dedicated-select-window ()
+  "Select aweshell dedicated window."
+  (select-window aweshell-dedicated-window)
+  (set-window-dedicated-p (selected-window) t))
+
+(defun aweshell-dedicated-pop-window ()
+  "Pop aweshell dedicated window if it exists."
+  (aweshell-dedicated-split-window)
+  (setq aweshell-dedicated-window (selected-window))
+  (set-window-buffer aweshell-dedicated-window (get-buffer aweshell-dedicated-buffer-name))
+  (set-window-dedicated-p (selected-window) t))
+
+(defun aweshell-dedicated-create-window ()
+  "Create aweshell dedicated window if it not existing."
+  (aweshell-dedicated-split-window)
   (eshell)
   (setq aweshell-dedicated-buffer (current-buffer))
   (setq aweshell-dedicated-window (selected-window))
   (ignore-errors (rename-buffer aweshell-dedicated-buffer-name))
   (set-window-dedicated-p (selected-window) t)
   (setq header-line-format nil))
+
+(defun aweshell-dedicated-split-window ()
+  "Split dedicated window at bottom of frame."
+  ;; Select bottom window of frame.
+  (ignore-errors
+    (dotimes (i 50)
+      (windmove-down)))
+  ;; Split with dedicated window height.
+  (split-window (selected-window) (- (aweshell-current-window-take-height) aweshell-dedicated-window-height))
+  (other-window 1))
 
 (defadvice delete-other-windows (around aweshell-delete-other-window-advice activate)
   "This is advice to make `aweshell' avoid dedicated window deleted.
