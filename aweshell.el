@@ -6,8 +6,8 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-08-13 23:18:35
-;; Version: 3.3
-;; Last-Updated: 2019-04-07 16:56:00
+;; Version: 4.0
+;; Last-Updated: 2019-07-16 00:19:24
 ;;           By: Andy Stewart
 ;; URL: http://www.emacswiki.org/emacs/download/aweshell.el
 ;; Keywords:
@@ -58,6 +58,7 @@
 ;; 13. Make cat file with syntax highlight.
 ;; 14. Alert user when background process finished or aborted.
 ;; 15. Complete shell command arguments like IDE feeling.
+;; 16. Dedicated shell window like IDE bottom terminal window.
 ;;
 
 ;;; Installation:
@@ -79,6 +80,9 @@
 ;; `aweshell-clear-buffer'
 ;; `aweshell-sudo-toggle'
 ;; `aweshell-switch-buffer'
+;; `aweshell-dedicated-toggle'
+;; `aweshell-dedicated-open'
+;; `aweshell-dedicated-close'
 ;;
 
 ;;; Customize:
@@ -98,6 +102,10 @@
 
 ;;; Change log:
 ;;;
+;;
+;; 2019/07/16
+;;      * Add `aweshell-dedicated-toggle' command.
+;;
 ;; 2019/04/29
 ;;      * Add interactive command `aweshell-switch-buffer'.
 ;;
@@ -408,33 +416,149 @@ Create new one if no eshell buffer exists."
   "Switch to another aweshell buffer."
   (interactive)
   (cond ((= 0 (length aweshell-buffer-list))
-	 (aweshell-new)
-	 (message "No Aweshell buffer yet, create a new one."))
-	((= 1 (length aweshell-buffer-list)) ; only one Aweshell buffer, just switch to it
-	 (switch-to-buffer (nth 0 aweshell-buffer-list)))
-	(t
-	 (let* ((completion-extra-properties '(:annotation-function aweshell-switch-buffer--annotate))
-		(buffer-alist (mapcar (lambda (buffer) `(,(buffer-name buffer) . ,buffer)) aweshell-buffer-list))
-		(pwd default-directory)
-		(preselect))
-	   ;; find most suitable preselect buffer
-	   (dolist (buffer aweshell-buffer-list)
-	     (with-current-buffer buffer
-	       (when (and
-		      (or (not preselect) (< (length preselect) (length default-directory)))
-		      (file-in-directory-p pwd default-directory))
-		 (setq preselect (propertize default-directory :buffer-name (buffer-name buffer))))))
-	   (let ((result-buffer (completing-read "Switch to Aweshell buffer: " buffer-alist nil t nil nil
-						 (get-text-property 0 :buffer-name (or preselect "")))))
-	     (switch-to-buffer (alist-get result-buffer buffer-alist nil nil #'equal)))))))
+         (aweshell-new)
+         (message "No Aweshell buffer yet, create a new one."))
+        ((= 1 (length aweshell-buffer-list)) ; only one Aweshell buffer, just switch to it
+         (switch-to-buffer (nth 0 aweshell-buffer-list)))
+        (t
+         (let* ((completion-extra-properties '(:annotation-function aweshell-switch-buffer--annotate))
+                (buffer-alist (mapcar (lambda (buffer) `(,(buffer-name buffer) . ,buffer)) aweshell-buffer-list))
+                (pwd default-directory)
+                (preselect))
+           ;; find most suitable preselect buffer
+           (dolist (buffer aweshell-buffer-list)
+             (with-current-buffer buffer
+               (when (and
+                      (or (not preselect) (< (length preselect) (length default-directory)))
+                      (file-in-directory-p pwd default-directory))
+                 (setq preselect (propertize default-directory :buffer-name (buffer-name buffer))))))
+           (let ((result-buffer (completing-read "Switch to Aweshell buffer: " buffer-alist nil t nil nil
+                                                 (get-text-property 0 :buffer-name (or preselect "")))))
+             (switch-to-buffer (alist-get result-buffer buffer-alist nil nil #'equal)))))))
 
 (defun aweshell-switch-buffer--annotate (candidate)
   (let* ((buffer-alist
-	  (mapcar (lambda (buffer) `(,(buffer-name buffer) . ,buffer)) aweshell-buffer-list))
-	 (candidate-buffer (alist-get candidate buffer-alist nil nil #'equal)))
+          (mapcar (lambda (buffer) `(,(buffer-name buffer) . ,buffer)) aweshell-buffer-list))
+         (candidate-buffer (alist-get candidate buffer-alist nil nil #'equal)))
     (with-current-buffer candidate-buffer
       ;; display the last command of aweshell buffer
       (format "  <%s> %s" (eshell-get-history 0) (if eshell-current-command "(Running)" "")))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Aweshell dedicated window ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defvar aweshell-dedicated-window nil
+  "The dedicated `aweshell' window.")
+
+(defvar aweshell-dedicated-buffer nil
+  "The dedicated `aweshell' buffer.")
+
+(defcustom aweshell-dedicated-window-height 14
+  "The height of `aweshell' dedicated window."
+  :type 'integer
+  :group 'aweshell)
+
+(defconst aweshell-dedicated-buffer-name "AWESHELL-DEDICATED"
+  "The buffer name of dedicated `aweshell'.")
+
+(defun aweshell-current-window-take-height (&optional window)
+  "Return the height the `window' takes up.
+Not the value of `window-height', it returns usable rows available for WINDOW.
+If `window' is nil, get current window."
+  (let ((edges (window-edges window)))
+    (- (nth 3 edges) (nth 1 edges))))
+
+(defun aweshell-dedicated-exist-p ()
+  (and (aweshell-buffer-exist-p aweshell-dedicated-buffer)
+       (aweshell-window-exist-p aweshell-dedicated-window)
+       ))
+
+(defun aweshell-window-exist-p (window)
+  "Return `non-nil' if WINDOW exist.
+Otherwise return nil."
+  (and window (window-live-p window)))
+
+(defun aweshell-buffer-exist-p (buffer)
+  "Return `non-nil' if `BUFFER' exist.
+Otherwise return nil."
+  (and buffer (buffer-live-p buffer)))
+
+(defun aweshell-dedicated-open ()
+  (interactive)
+  (if (aweshell-buffer-exist-p aweshell-dedicated-buffer)
+      (if (aweshell-window-exist-p aweshell-dedicated-window)
+          (progn
+            (select-window aweshell-dedicated-window)
+            (set-window-dedicated-p (selected-window) t))
+        (progn
+          (split-window (selected-window) (- (aweshell-current-window-take-height) aweshell-dedicated-window-height))
+          (other-window 1)
+          (setq aweshell-dedicated-window (selected-window))
+          (set-window-buffer aweshell-dedicated-window (get-buffer aweshell-dedicated-buffer-name))
+          (set-window-dedicated-p (selected-window) t)))
+    (aweshell-dedicated-create)
+    ))
+
+(defun aweshell-dedicated-select ()
+  "Select the `aweshell' dedicated window."
+  (interactive)
+  (if (aweshell-dedicated-exist-p)
+      (select-window aweshell-dedicated-window)
+    (message "`aweshell' window is not exist.")))
+
+(defun aweshell-dedicated-close ()
+  "Close dedicated `aweshell' window."
+  (interactive)
+  (if (aweshell-dedicated-exist-p)
+      (let ((current-window (selected-window)))
+        ;; Remember height.
+        (aweshell-dedicated-select)
+        (delete-window aweshell-dedicated-window)
+        (if (aweshell-window-exist-p current-window)
+            (select-window current-window)))
+    (message "`AWESHELL DEDICATED' window is not exist.")))
+
+(defun aweshell-dedicated-toggle ()
+  "Toggle dedicated `aweshell' window."
+  (interactive)
+  (if (aweshell-dedicated-exist-p)
+      (aweshell-dedicated-close)
+    (aweshell-dedicated-open)
+    ))
+
+(defun aweshell-dedicated-create ()
+  (split-window (selected-window) (- (aweshell-current-window-take-height) aweshell-dedicated-window-height))
+  (other-window 1)
+  (eshell)
+  (setq aweshell-dedicated-buffer (current-buffer))
+  (setq aweshell-dedicated-window (selected-window))
+  (ignore-errors (rename-buffer aweshell-dedicated-buffer-name))
+  (set-window-dedicated-p (selected-window) t)
+  (setq header-line-format nil))
+
+(defadvice delete-other-windows (around aweshell-delete-other-window-advice activate)
+  "This is advice to make `aweshell' avoid dedicated window deleted.
+Dedicated window can't deleted by command `delete-other-windows'."
+  (unless (eq (selected-window) aweshell-dedicated-window)
+    (let ((aweshell-dedicated-active-p (aweshell-window-exist-p aweshell-dedicated-window)))
+      (if aweshell-dedicated-active-p
+          (let ((current-window (selected-window)))
+            (cl-dolist (win (window-list))
+              (when (and (window-live-p win)
+                         (not (eq current-window win))
+                         (not (window-dedicated-p win)))
+                (delete-window win))))
+        ad-do-it))))
+
+(defadvice other-window (after aweshell-dedicated-other-window-advice)
+  "Default, can use `other-window' select window in cyclic ordering of windows.
+But sometimes we don't want to select `sr-speedbar' window,
+but use `other-window' and just make `aweshell' dedicated
+window as a viewable sidebar.
+
+This advice can make `other-window' skip `aweshell' dedicated window."
+  (let ((count (or (ad-get-arg 0) 1)))
+    (when (and (aweshell-window-exist-p aweshell-dedicated-window)
+               (eq aweshell-dedicated-window (selected-window)))
+      (other-window count))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Aweshell keymap ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (add-hook 'eshell-mode-hook
