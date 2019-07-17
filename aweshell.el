@@ -6,8 +6,8 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-08-13 23:18:35
-;; Version: 4.2
-;; Last-Updated: 2019-07-16 07:20:21
+;; Version: 4.3
+;; Last-Updated: 2019-07-17 11:58:45
 ;;           By: Andy Stewart
 ;; URL: http://www.emacswiki.org/emacs/download/aweshell.el
 ;; Keywords:
@@ -103,6 +103,9 @@
 
 ;;; Change log:
 ;;;
+;;
+;; 2019/07/17
+;;      * Fix #37 issue: aweshell-dedicated-toggle failed after user use cd command in aweshell.
 ;;
 ;; 2019/07/16
 ;;      * Add `aweshell-dedicated-toggle' command.
@@ -458,9 +461,6 @@ Create new one if no eshell buffer exists."
 (defvar aweshell-dedicated-buffer nil
   "The dedicated `aweshell' buffer.")
 
-(defconst aweshell-dedicated-buffer-name "AWESHELL-DEDICATED"
-  "The buffer name of dedicated `aweshell'.")
-
 (defun aweshell-current-window-take-height (&optional window)
   "Return the height the `window' takes up.
 Not the value of `window-height', it returns usable rows available for WINDOW.
@@ -519,7 +519,7 @@ Otherwise return nil."
 (defun aweshell-dedicated-pop-window ()
   "Pop aweshell dedicated window if it exists."
   (aweshell-dedicated-split-window)
-  (aweshell-dedicated-switch-buffer)
+  (set-window-buffer aweshell-dedicated-window aweshell-dedicated-buffer)
   (set-window-dedicated-p (selected-window) t))
 
 (defun aweshell-dedicated-create-window ()
@@ -539,16 +539,11 @@ Otherwise return nil."
   (other-window 1)
   (setq aweshell-dedicated-window (selected-window)))
 
-(defun aweshell-dedicated-switch-buffer ()
-  "Switch to aweshell dedicated buffer."
-  (set-window-buffer aweshell-dedicated-window (get-buffer aweshell-dedicated-buffer-name)))
-
 (defun aweshell-dedicated-create-buffer ()
   "Create aweshell dedicated buffer."
   (eshell)
   (setq header-line-format nil)
-  (setq aweshell-dedicated-buffer (current-buffer))
-  (ignore-errors (rename-buffer aweshell-dedicated-buffer-name)))
+  (setq aweshell-dedicated-buffer (current-buffer)))
 
 (defadvice delete-other-windows (around aweshell-delete-other-window-advice activate)
   "This is advice to make `aweshell' avoid dedicated window deleted.
