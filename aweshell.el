@@ -15,7 +15,7 @@
 ;;
 ;; Features that might be required by this library:
 ;;
-;; `eshell' `eshell-prompt-extras' `exec-path-from-shell' `cl' `subr-x'
+;; `eshell' `eshell-prompt-extras' `exec-path-from-shell' `cl-lib' `subr-x'
 ;;
 
 ;;; This file is NOT part of GNU Emacs
@@ -103,6 +103,9 @@
 
 ;;; Change log:
 ;;;
+;;
+;; 2019/09/12
+;;      * Use `cl-lib' instead of `cl'
 ;;
 ;; 2019/07/17
 ;;      * Fix #37 issue: aweshell-dedicated-toggle failed after user use cd command in aweshell.
@@ -201,7 +204,7 @@
 
 ;;; Require
 (require 'eshell)
-(require 'cl)
+(require 'cl-lib)
 (require 'subr-x)
 
 ;;; Code:
