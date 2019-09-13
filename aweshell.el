@@ -869,8 +869,8 @@ This advice can make `other-window' skip `aweshell' dedicated window."
            (command-prefix-args (mapconcat 'identity (nbutlast (split-string prefix)) " "))
            (command-last-arg (car (last (split-string prefix))))
            (completions (ignore-errors (pcomplete-completions)))
-           (shell-completions (if (typep completions 'cons)
-                                  (remove-if-not (lambda (c) (string-prefix-p command-last-arg c)) completions)
+           (shell-completions (if (cl-typep completions 'cons)
+                                  (cl-remove-if-not (lambda (c) (string-prefix-p command-last-arg c)) completions)
                                 nil))
            (suggest-completions (mapcar (lambda (c) (string-trim (concat command-prefix-args " " c))) shell-completions)))
       ;; Mix best history and complete arguments just when history not exist in completion arguments.
