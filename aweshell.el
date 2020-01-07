@@ -400,7 +400,7 @@ Create new one if no eshell buffer exists."
   (interactive)
   (save-excursion
     (let ((commands (buffer-substring-no-properties
-                     (eshell-bol) (point-max))))
+                     (progn (eshell-bol) (point)) (point-max))))
       (if (string-match-p "^sudo " commands)
           (progn
             (eshell-bol)
