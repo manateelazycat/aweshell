@@ -782,11 +782,10 @@ This advice can make `other-window' skip `aweshell' dedicated window."
 ;; Rest is completion arguments from shell completion.
 (defun aweshell-reload-shell-history ()
   (with-temp-message ""
-    (let* ((shell-command (getenv "SHELL")))
-      (cond ((string-equal shell-command "/bin/bash")
+    (cond ((string-equal shell-file-name "/bin/bash")
              (shell-command "history -r"))
-            ((string-equal shell-command "/bin/zsh")
-             (shell-command "fc -W; fc -R"))))))
+            ((string-equal shell-file-name "/bin/zsh")
+             (shell-command "fc -W; fc -R")))))
 
 (defun aweshell-parse-bash-history ()
   "Parse the bash history."
