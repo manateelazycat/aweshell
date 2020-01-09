@@ -601,9 +601,7 @@ This advice can make `other-window' skip `aweshell' dedicated window."
 (defun aweshell-validate-command ()
   (save-excursion
     (beginning-of-line)
-    (re-search-forward (format "%s\\([^ \t\r\n\v\f]*\\)" eshell-prompt-regexp)
-                       (line-end-position)
-                       t)
+    (re-search-forward  "\\([^ \t\r\n\v\f]*\\)" (line-end-position) t)
     (let ((beg (match-beginning 1))
           (end (match-end 1))
           (command (match-string 1)))
