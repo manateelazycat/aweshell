@@ -6,8 +6,8 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-08-13 23:18:35
-;; Version: 4.3
-;; Last-Updated: 2019-07-17 11:58:45
+;; Version: 4.4
+;; Last-Updated: 2020-01-14 09:27:39
 ;;           By: Andy Stewart
 ;; URL: http://www.emacswiki.org/emacs/download/aweshell.el
 ;; Keywords:
@@ -103,6 +103,9 @@
 
 ;;; Change log:
 ;;;
+;;
+;; 2020/01/14
+;;      * Fix issue #49
 ;;
 ;; 2019/09/12
 ;;      * Use `cl-lib' instead of `cl'
@@ -784,9 +787,9 @@ This advice can make `other-window' skip `aweshell' dedicated window."
 (defun aweshell-reload-shell-history ()
   (with-temp-message ""
     (cond ((string-equal shell-file-name "/bin/bash")
-             (shell-command "history -r"))
-            ((string-equal shell-file-name "/bin/zsh")
-             (shell-command "fc -W; fc -R")))))
+           (shell-command "history -r"))
+          ((string-equal shell-file-name "/bin/zsh")
+           (shell-command "fc -W; fc -R")))))
 
 (defun aweshell-parse-bash-history ()
   "Parse the bash history."
@@ -832,26 +835,18 @@ This advice can make `other-window' skip `aweshell' dedicated window."
      (aweshell-parse-zsh-history)))))
 
 (defun aweshell-autosuggest--prefix ()
-  "Get current eshell input."
-  (catch 'no-prompt
-    (let* ((point-min (point-min))
-           (input-start
-            (save-excursion
-              (beginning-of-line)
-              (while (and (not (looking-at-p eshell-prompt-regexp))
-                          (not (eq point-min (point))))
-                (forward-line -1))
-              (when (eq point-min (point))
-                (throw 'no-prompt 'stop))
-              (eshell-bol)))
-           (prefix
-            (string-trim-left
-             (buffer-substring-no-properties
-              input-start
-              (line-end-position)))))
-      (if (not (string-empty-p prefix))
-          prefix
-        'stop))))
+  "Get current eshell input.
+
+If this function return non-nil prefix, aweshell will popup completion menu in aweshell buffer.
+This function only return prefix when current point at eshell prompt line, avoid insert unnecessary indent char, such as ghci prompt. (See issue #49)."
+  (when (save-excursion
+          (beginning-of-line)
+          (looking-at-p eshell-prompt-regexp))
+    (string-trim-left
+     (buffer-substring-no-properties
+      (save-excursion
+        (eshell-bol))
+      (line-end-position)))))
 
 (defun aweshell-autosuggest-candidates (prefix)
   "Select the first eshell history candidate and shell completions that starts with PREFIX."
@@ -885,7 +880,7 @@ This advice can make `other-window' skip `aweshell' dedicated window."
   (interactive (list 'interactive))
   (cl-case command
     (interactive (company-begin-backend 'aweshell-autosuggest))
-    (prefix (and (eq major-mode 'eshell-mode)
+    (prefix (and (derived-mode-p 'eshell-mode)
                  (aweshell-autosuggest--prefix)))
     (candidates (aweshell-autosuggest-candidates arg))
     (sorted nil)))
