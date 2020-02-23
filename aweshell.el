@@ -760,7 +760,9 @@ This advice can make `other-window' skip `aweshell' dedicated window."
            (font-lock-ensure)
          (with-no-warnings
            (font-lock-fontify-buffer)))
-       (buffer-string)))
+       (let ((contents (buffer-string)))
+             (remove-text-properties 0 (length contents) '(read-only nil) contents)
+             contents)))
     (unless existing-buffer
       (kill-buffer buffer))
     nil))
