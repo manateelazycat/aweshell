@@ -6,8 +6,8 @@
 ;; Maintainer: Andy Stewart <lazycat.manatee@gmail.com>
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-08-13 23:18:35
-;; Version: 4.4
-;; Last-Updated: 2020-01-14 09:27:39
+;; Version: 4.5
+;; Last-Updated: 2020-03-28 10:03:43
 ;;           By: Andy Stewart
 ;; URL: http://www.emacswiki.org/emacs/download/aweshell.el
 ;; Keywords:
@@ -103,6 +103,9 @@
 
 ;;; Change log:
 ;;;
+;;
+;; 2020/03/28
+;;      * Hide hl-line in shell.
 ;;
 ;; 2020/01/14
 ;;      * Fix issue #49
@@ -577,6 +580,10 @@ This advice can make `other-window' skip `aweshell' dedicated window."
                (eq aweshell-dedicated-window (selected-window)))
       (other-window count))))
 
+(add-hook 'eshell-mode-hook
+          (lambda ()
+            (face-remap-add-relative 'hl-line :background (face-background 'default))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Aweshell keymap ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (add-hook 'eshell-mode-hook
           (lambda ()
@@ -761,8 +768,8 @@ This advice can make `other-window' skip `aweshell' dedicated window."
          (with-no-warnings
            (font-lock-fontify-buffer)))
        (let ((contents (buffer-string)))
-             (remove-text-properties 0 (length contents) '(read-only nil) contents)
-             contents)))
+         (remove-text-properties 0 (length contents) '(read-only nil) contents)
+         contents)))
     (unless existing-buffer
       (kill-buffer buffer))
     nil))
