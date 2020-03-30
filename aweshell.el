@@ -274,6 +274,14 @@
   :type 'integer
   :group 'aweshell)
 
+(defcustom aweshell-auto-suggestion-p t
+  "Whether auto suggestion like fish.
+Default is enable, but sometimes, this feature will insert random indent char.
+
+If this function affects you, disable this option."
+  :type 'boolean
+  :group 'aweshell)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Variable ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defvar aweshell-buffer-list nil
   "The list of non-dedicated eshell buffers.")
@@ -793,113 +801,115 @@ This advice can make `other-window' skip `aweshell' dedicated window."
 ;; Auto suggestion.
 ;; First completion candidate is best match that pick from shell history.
 ;; Rest is completion arguments from shell completion.
-(defun aweshell-reload-shell-history ()
-  (with-temp-message ""
-    (cond ((string-equal shell-file-name "/bin/bash")
-           (shell-command "history -r"))
-          ((string-equal shell-file-name "/bin/zsh")
-           (shell-command "fc -W; fc -R")))))
+(when aweshell-auto-suggestion-p
+  (defun aweshell-reload-shell-history ()
+    (with-temp-message ""
+      (cond ((string-equal shell-file-name "/bin/bash")
+             (shell-command "history -r"))
+            ((string-equal shell-file-name "/bin/zsh")
+             (shell-command "fc -W; fc -R")))))
 
-(defun aweshell-parse-bash-history ()
-  "Parse the bash history."
-  (if (file-exists-p "~/.bash_history")
-      (let (collection bash_history)
-        (aweshell-reload-shell-history)
-        (setq collection
-              (nreverse
-               (split-string (with-temp-buffer (insert-file-contents (file-truename "~/.bash_history"))
-                                               (buffer-string))
-                             "\n"
-                             t)))
-        (when (and collection (> (length collection) 0)
-                   (setq bash_history collection))
-          bash_history))
-    nil))
+  (defun aweshell-parse-bash-history ()
+    "Parse the bash history."
+    (if (file-exists-p "~/.bash_history")
+        (let (collection bash_history)
+          (aweshell-reload-shell-history)
+          (setq collection
+                (nreverse
+                 (split-string (with-temp-buffer (insert-file-contents (file-truename "~/.bash_history"))
+                                                 (buffer-string))
+                               "\n"
+                               t)))
+          (when (and collection (> (length collection) 0)
+                     (setq bash_history collection))
+            bash_history))
+      nil))
 
-(defun aweshell-parse-zsh-history ()
-  "Parse the bash history."
-  (if (file-exists-p "~/.zsh_history")
-      (let (collection zsh_history)
-        (aweshell-reload-shell-history)
-        (setq collection
-              (nreverse
-               (split-string (with-temp-buffer (insert-file-contents (file-truename "~/.zsh_history"))
-                                               (replace-regexp-in-string "^:[^;]*;" "" (buffer-string)))
-                             "\n"
-                             t)))
-        (when (and collection (> (length collection) 0)
-                   (setq zsh_history collection))
-          zsh_history))
-    nil))
+  (defun aweshell-parse-zsh-history ()
+    "Parse the bash history."
+    (if (file-exists-p "~/.zsh_history")
+        (let (collection zsh_history)
+          (aweshell-reload-shell-history)
+          (setq collection
+                (nreverse
+                 (split-string (with-temp-buffer (insert-file-contents (file-truename "~/.zsh_history"))
+                                                 (replace-regexp-in-string "^:[^;]*;" "" (buffer-string)))
+                               "\n"
+                               t)))
+          (when (and collection (> (length collection) 0)
+                     (setq zsh_history collection))
+            zsh_history))
+      nil))
 
-(defun aweshell-parse-shell-history ()
-  "Parse history from eshell/bash/zsh/ ."
-  (delete-dups
-   (mapcar
-    (lambda (str)
-      (string-trim (substring-no-properties str)))
-    (append
-     (ring-elements eshell-history-ring)
-     (aweshell-parse-bash-history)
-     (aweshell-parse-zsh-history)))))
+  (defun aweshell-parse-shell-history ()
+    "Parse history from eshell/bash/zsh/ ."
+    (delete-dups
+     (mapcar
+      (lambda (str)
+        (string-trim (substring-no-properties str)))
+      (append
+       (ring-elements eshell-history-ring)
+       (aweshell-parse-bash-history)
+       (aweshell-parse-zsh-history)))))
 
-(defun aweshell-autosuggest--prefix ()
-  "Get current eshell input.
+  (defun aweshell-autosuggest--prefix ()
+    "Get current eshell input.
 
 If this function return non-nil prefix, aweshell will popup completion menu in aweshell buffer.
 This function only return prefix when current point at eshell prompt line, avoid insert unnecessary indent char, such as ghci prompt. (See issue #49)."
-  (when (save-excursion
-          (beginning-of-line)
-          (looking-at-p eshell-prompt-regexp))
-    (string-trim-left
-     (buffer-substring-no-properties
-      (save-excursion
-        (eshell-bol))
-      (line-end-position)))))
+    (when (save-excursion
+            (beginning-of-line)
+            (looking-at-p eshell-prompt-regexp))
+      (string-trim-left
+       (buffer-substring-no-properties
+        (save-excursion
+          (eshell-bol))
+        (line-end-position)))))
 
-(defun aweshell-autosuggest-candidates (prefix)
-  "Select the first eshell history candidate and shell completions that starts with PREFIX."
-  (unless (or
-           ;; When the command includes ", *, \ or [ characters, the `pcomplete-completions' command will report an error,
-           ;; So company menu will be disabled when these characters are included.
-           (cl-search "\"" prefix)
-           (cl-search "[" prefix)
-           (cl-search "\*" prefix)
-           (cl-search "\\" prefix))
-    (let* ((most-similar (cl-find-if
-                          (lambda (str)
-                            (string-prefix-p prefix str))
-                          (aweshell-parse-shell-history)))
-           (command-prefix-args (mapconcat 'identity (nbutlast (split-string prefix)) " "))
-           (command-last-arg (car (last (split-string prefix))))
-           (completions (ignore-errors (pcomplete-completions)))
-           (shell-completions (if (cl-typep completions 'cons)
-                                  (cl-remove-if-not (lambda (c) (string-prefix-p command-last-arg c)) completions)
-                                nil))
-           (suggest-completions (mapcar (lambda (c) (string-trim (concat command-prefix-args " " c))) shell-completions)))
-      ;; Mix best history and complete arguments just when history not exist in completion arguments.
-      (if (and most-similar
-               (not (member most-similar suggest-completions)))
-          (append (list most-similar) suggest-completions)
-        suggest-completions)
-      )))
+  (defun aweshell-autosuggest-candidates (prefix)
+    "Select the first eshell history candidate and shell completions that starts with PREFIX."
+    (unless (or
+             ;; When the command includes ", *, \ or [ characters, the `pcomplete-completions' command will report an error,
+             ;; So company menu will be disabled when these characters are included.
+             (cl-search "\"" prefix)
+             (cl-search "[" prefix)
+             (cl-search "\*" prefix)
+             (cl-search "\\" prefix))
+      (let* ((most-similar (cl-find-if
+                            (lambda (str)
+                              (string-prefix-p prefix str))
+                            (aweshell-parse-shell-history)))
+             (command-prefix-args (mapconcat 'identity (nbutlast (split-string prefix)) " "))
+             (command-last-arg (car (last (split-string prefix))))
+             (completions (ignore-errors (pcomplete-completions)))
+             (shell-completions (if (cl-typep completions 'cons)
+                                    (cl-remove-if-not (lambda (c) (string-prefix-p command-last-arg c)) completions)
+                                  nil))
+             (suggest-completions (mapcar (lambda (c) (string-trim (concat command-prefix-args " " c))) shell-completions)))
+        ;; Mix best history and complete arguments just when history not exist in completion arguments.
+        (if (and most-similar
+                 (not (member most-similar suggest-completions)))
+            (append (list most-similar) suggest-completions)
+          suggest-completions)
+        )))
 
-(defun aweshell-autosuggest (command &optional arg &rest ignored)
-  "`company-mode' backend to provide eshell history suggestion."
-  (interactive (list 'interactive))
-  (cl-case command
-    (interactive (company-begin-backend 'aweshell-autosuggest))
-    (prefix (and (derived-mode-p 'eshell-mode)
-                 (aweshell-autosuggest--prefix)))
-    (candidates (aweshell-autosuggest-candidates arg))
-    (sorted nil)))
+  (defun aweshell-autosuggest (command &optional arg &rest ignored)
+    "`company-mode' backend to provide eshell history suggestion."
+    (interactive (list 'interactive))
+    (cl-case command
+      (interactive (company-begin-backend 'aweshell-autosuggest))
+      (prefix (and (derived-mode-p 'eshell-mode)
+                   (aweshell-autosuggest--prefix)))
+      (candidates (aweshell-autosuggest-candidates arg))
+      (sorted nil)))
 
-(add-hook 'eshell-mode-hook
-          (lambda ()
-            (company-mode 1)
-            (setq-local company-idle-delay 0)
-            (setq-local company-backends '(aweshell-autosuggest))
-            ))
+  (add-hook 'eshell-mode-hook
+            (lambda ()
+              (company-mode 1)
+              (setq-local company-idle-delay 0)
+              (setq-local company-backends '(aweshell-autosuggest))
+              ))
+  )
 
 (provide 'aweshell)
 
