@@ -86,3 +86,6 @@ Other customization of eshell-up:
 (setq eshell-up-ignore-case nil)
 (setq eshell-up-print-parent-dir t)
 ```
+
+### FAQ
+If you got error that random space insert, you perhaps need turn off ```aweshell-auto-suggestion-p``` with ```(setq aweshell-auto-suggestion-p nil)```, meantime auto suggestion feature will turn off.
