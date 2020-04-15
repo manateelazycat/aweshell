@@ -535,7 +535,7 @@ Otherwise return nil."
 
 (defun aweshell-dedicated-pop-window ()
   "Pop aweshell dedicated window if it exists."
-  (setq aweshell-dedicated-window (display-buffer (car (aweshell-get-buffer-names)) '(display-buffer-in-side-window (side . bottom) (window-height . aweshell-dedicated-window-height))))
+  (setq aweshell-dedicated-window (display-buffer (car (aweshell-get-buffer-names)) `(display-buffer-in-side-window (side . bottom) (window-height . ,aweshell-dedicated-window-height))))
   (select-window aweshell-dedicated-window)
   (set-window-buffer aweshell-dedicated-window aweshell-dedicated-buffer)
   (set-window-dedicated-p (selected-window) t))
