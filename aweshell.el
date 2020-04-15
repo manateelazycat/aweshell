@@ -535,15 +535,17 @@ Otherwise return nil."
 
 (defun aweshell-dedicated-pop-window ()
   "Pop aweshell dedicated window if it exists."
-  (aweshell-dedicated-split-window)
+  (setq aweshell-dedicated-window (display-buffer (car (aweshell-get-buffer-names)) '(display-buffer-in-side-window (side . bottom) (window-height . aweshell-dedicated-window-height))))
+  (select-window aweshell-dedicated-window)
   (set-window-buffer aweshell-dedicated-window aweshell-dedicated-buffer)
   (set-window-dedicated-p (selected-window) t))
 
 (defun aweshell-dedicated-create-window ()
   "Create aweshell dedicated window if it not existing."
-  (aweshell-dedicated-split-window)
-  (aweshell-dedicated-create-buffer)
-  (set-window-dedicated-p (selected-window) t))
+  (eshell)
+  (setq aweshell-dedicated-buffer (current-buffer))
+  (previous-buffer)
+  (aweshell-dedicated-pop-window))
 
 (defun aweshell-dedicated-split-window ()
   "Split dedicated window at bottom of frame."
