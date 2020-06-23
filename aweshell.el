@@ -212,6 +212,7 @@
 (require 'eshell)
 (require 'cl-lib)
 (require 'subr-x)
+(require 'seq)
 
 ;;; Code:
 
