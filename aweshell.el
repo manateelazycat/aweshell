@@ -649,7 +649,7 @@ This advice can make `other-window' skip `aweshell' dedicated window."
                        (functionp (intern command)))
                       aweshell-valid-command-color
                     aweshell-invalid-command-color)))
-        (put-text-property beg end 'rear-nonsticky t)))))
+        (remove-text-properties end (line-end-position) '(face nil))))))
 
 (add-hook 'eshell-mode-hook
           (lambda ()
