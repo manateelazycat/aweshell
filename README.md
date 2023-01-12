@@ -49,6 +49,15 @@ aweshell-dedicated-open
 aweshell-dedicated-close
 ```
 
+## Installing with Quelpa
+
+If you prefer to use a package manager, you can use [quelpa-use-package](https://github.com/quelpa/quelpa-use-package).
+
+```Elisp
+(use-package aweshell
+  :quelpa (abc-mode :fetcher github :repo "manateelazycat/aweshell"))
+```
+
 # Customize
 
 Customize variables below by:
