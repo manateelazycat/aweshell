@@ -285,6 +285,11 @@ If this function affects you, disable this option."
   :type 'boolean
   :group 'aweshell)
 
+(defcustom aweshell-search-history-completing-read-fn 'ido-completing-read
+  "Function to be used for `completing-read' on search history."
+  :type 'function
+  :group 'aweshell)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Variable ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defvar aweshell-buffer-list nil
   "The list of non-dedicated eshell buffers.")
@@ -435,7 +440,7 @@ Create new one if no eshell buffer exists."
     (let* ((start-pos (eshell-beginning-of-input))
            (input (eshell-get-old-input))
            (all-shell-history (aweshell-parse-shell-history)))
-      (let* ((command (ido-completing-read "Search history: " all-shell-history)))
+      (let* ((command (funcall aweshell-search-history-completing-read-fn "Search history: " all-shell-history)))
         (eshell-kill-input)
         (insert command)
         )))
