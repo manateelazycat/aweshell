@@ -459,15 +459,15 @@ Create new one if no eshell buffer exists."
           (t
            (let* ((completion-extra-properties '(:annotation-function aweshell-switch-buffer--annotate))
                   (buffer-alist (mapcar (lambda (buffer) `(,(buffer-name buffer) . ,buffer))
-					live-aweshell-buffer-list))
+					                    live-aweshell-buffer-list))
                   (pwd default-directory)
                   (preselect))
              ;; find most suitable preselect buffer
              (dolist (buffer live-aweshell-buffer-list)
                (with-current-buffer buffer
-		 (when (and
-			(or (not preselect) (< (length preselect) (length default-directory)))
-			(file-in-directory-p pwd default-directory))
+		         (when (and
+			            (or (not preselect) (< (length preselect) (length default-directory)))
+			            (file-in-directory-p pwd default-directory))
                    (setq preselect (propertize default-directory :buffer-name (buffer-name buffer))))))
              (let ((result-buffer (completing-read "Switch to Aweshell buffer: " buffer-alist nil t nil nil
                                                    (get-text-property 0 :buffer-name (or preselect "")))))
@@ -917,11 +917,10 @@ This function only return prefix when current point at eshell prompt line, avoid
 
   (add-hook 'eshell-mode-hook
             (lambda ()
-              (company-mode 1)
-              (setq-local company-idle-delay 0)
-              (setq-local company-backends '(aweshell-autosuggest))
-              ))
-  )
+              (when (fboundp 'comany-mode)
+                (company-mode 1)
+                (setq-local company-idle-delay 0)
+                (setq-local company-backends '(aweshell-autosuggest))))))
 
 (provide 'aweshell)
 
