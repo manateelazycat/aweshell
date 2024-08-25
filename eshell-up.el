@@ -1,4 +1,4 @@
-;;; eshell-up.el --- Quickly go to a specific parent directory in eshell
+;;; eshell-up.el --- Quickly go to a specific parent directory in eshell -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2016 Peter W. V. Tran-Jørgensen
 
@@ -6,7 +6,7 @@
 ;; Maintainer: Peter W. V. Tran-Jørgensen <peter.w.v.jorgensen@gmail.com>
 ;; URL: https://github.com/peterwvj/eshell-up
 ;; Created: 14th October 2016
-;; Version: 0.0.3
+;; Version: 0.0.4
 ;; Package-Requires: ((emacs "24"))
 ;; Keywords: eshell
 
@@ -91,6 +91,7 @@ Argument MATCH a string that identifies the parent directory to search for."
                                         nil)))))
       closest-parent)))
 
+;;;###autoload
 (defun eshell-up (&optional match)
   "Go to a specific parent directory in eshell.
 Argument MATCH a string that identifies the parent directory to go
@@ -106,6 +107,7 @@ to."
             (eshell/echo parent-dir)
           (eshell/echo path))))))
 
+;;;###autoload
 (defun eshell-up-peek (&optional match)
   "Find a specific parent directory in eshell.
 Argument MATCH a string that identifies the parent directory to find"
